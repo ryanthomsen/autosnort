@@ -8,10 +8,13 @@ import scapy.all as scapy
 
 ### HELPER FUNCTIONS (IF NECESSARY) ###
 def HelperMethods(pcap):
-  for i in range(0,20):
-    print(str(i) + " : ")
-    pcap[i].summary
-    print("\n\n")
+  counter = 0
+  for packet in pcap:
+    if(counter<= 100):
+      print(str(counter) + " : ")
+      print(str(packet.summary))
+      print("\n")
+      counter +=1
   
 
 ### MAIN FUNCTION ###
