@@ -3,12 +3,12 @@
 ### IMPORT STATEMENTS ###
 import sys
 import os
+from time import gmtime
 from scapy.all import *
 from scapy.layers.inet import IP, UDP, TCP, ICMP
 from scapy.layers.dns import DNS, DNSQR, DNSRR
 from scapy.layers.http import *
-
-import getopt
+from time import gmtime, localtime
 
 #MAGIC NUMBERS
 SID_START = 1000000
@@ -30,7 +30,8 @@ def readP(singlepacket):
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
     timestmptcp = singlepacket[TCP].time
-    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(timestmptcp))
+    #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
+    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
 
     # Print HTTP Request Type
     # Check if HTTP is present in the packet
@@ -58,14 +59,16 @@ def readP(singlepacket):
     udpsrcport = singlepacket[UDP].sport
     udpdestport = singlepacket[UDP].dport
     timestmpudp = singlepacket[UDP].time
-    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(timestmpudp))
+    #print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(round(timestmpudp * 100) / 100))
+    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(gmtime(timestmpudp)))
   
   # Print ICMP Type:
   # Check if ICMP is present in the packet
   if ICMP in singlepacket:
     icmptype = singlepacket[ICMP].type
     timestmpicmp = singlepacket[ICMP].time
-    print("ICMP Type: " + str(icmptype) + " | time: " + str(timestmpicmp))
+    #print("ICMP Type: " + str(icmptype) + " | time: " + str(round((timestmpicmp * 100) /100))
+    print("ICMP Type: " + str(icmptype) + " | time: " + str(gmtime(timestmpicmp)))
 
 # Method to suggest snort rules based on packet information
 def RuleMaker(singlepacket) -> list:
