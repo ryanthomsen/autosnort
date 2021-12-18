@@ -33,7 +33,9 @@ def readP(singlepacket):
     print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
     #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
 
-    
+    timestmptcp = gmtime(timestmptcp)
+    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(timestmptcp[1]) + str(timestmptcp[2]) + str(timestmptcp[0]) + ", " + str(timestmptcp[3]) + str(timestmptcp[4]) + str(timestmptcp[5]))
+
     # Print HTTP Request Type
     # Check if HTTP is present in the packet
     if tcpdestport == 80:
