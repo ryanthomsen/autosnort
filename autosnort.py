@@ -6,6 +6,7 @@ import os
 from scapy.all import *
 from scapy.layers.inet import IP, UDP, TCP, ICMP
 from scapy.layers.dns import DNS, DNSQR, DNSRR
+from scapy.layers.http import *
 
 import getopt
 
@@ -22,14 +23,22 @@ def readP(singlepacket):
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
     print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport))
-  
+
+
+    if tcpdestport == 80:
+      if singlepacket.haslayer(HTTPRequest):  # Checks if packet has payload
+        #rawload = singlepacket[0][0][Raw].load
+        print("HTTP Request Type: " + str(singlepacket[HTTPRequest].Method))
+
+
   if DNS in singlepacket:
     hostname = singlepacket[DNSQR].qname
     print("DNS HostName: " + str(hostname))
 
   if DNSRR in singlepacket:
     hostaddr = singlepacket[DNSRR].rdata
-    print("DNS Host Address: " + str(hostaddr))
+    #recordtype = singlepacket[DNSRR].qtype
+    print("DNS Host Address: " + str(hostaddr)) #+ " | TCP Dest Port: " + str(recordtype))
   
   if UDP in singlepacket:
     udpsrcport = singlepacket[UDP].sport
@@ -44,10 +53,11 @@ def readP(singlepacket):
 def HelperMethods(pcap):
   counter = 0
   for data in pcap:
-    print(str(counter) + " : ")
-    readP(data)
-    counter +=1
-    print("\n\n")
+    if counter <=100:
+      print(str(counter) + " : ")
+      readP(data)
+      counter +=1
+      print("\n\n")
   
   
 
