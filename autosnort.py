@@ -29,7 +29,8 @@ def readP(singlepacket):
   if TCP in singlepacket:
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
-    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport))
+    timestmptcp = singlepacket[TCP].time
+    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(timestmptcp))
 
     # Print HTTP Request Type
     # Check if HTTP is present in the packet
@@ -56,13 +57,15 @@ def readP(singlepacket):
   if UDP in singlepacket:
     udpsrcport = singlepacket[UDP].sport
     udpdestport = singlepacket[UDP].dport
-    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport))
+    timestmpudp = singlepacket[UDP].time
+    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(timestmpudp))
   
   # Print ICMP Type:
   # Check if ICMP is present in the packet
   if ICMP in singlepacket:
     icmptype = singlepacket[ICMP].type
-    print("ICMP Type: " + str(icmptype))
+    timestmpicmp = singlepacket[ICMP].time
+    print("ICMP Type: " + str(icmptype) + " | time: " + str(timestmpicmp))
 
 # Method to suggest snort rules based on packet information
 def RuleMaker(singlepacket) -> list:
