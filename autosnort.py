@@ -44,10 +44,11 @@ def readP(singlepacket):
 def HelperMethods(pcap):
   counter = 0
   for data in pcap:
-    print(str(counter) + " : ")
-    readP(data)
-    counter +=1
-    print("\n\n")
+    if counter >= 100:
+      print(str(counter) + " : ")
+      readP(data)
+      counter +=1
+      print("\n\n")
   
   
 
