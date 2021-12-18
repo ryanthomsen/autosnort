@@ -30,9 +30,10 @@ def readP(singlepacket):
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
     timestmptcp = singlepacket[TCP].time
-    #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
-    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
+    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
+    #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
 
+    
     # Print HTTP Request Type
     # Check if HTTP is present in the packet
     if tcpdestport == 80:
@@ -60,7 +61,9 @@ def readP(singlepacket):
     udpdestport = singlepacket[UDP].dport
     timestmpudp = singlepacket[UDP].time
     #print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(round(timestmpudp * 100) / 100))
-    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(gmtime(timestmpudp)))
+
+    timestmpudp = gmtime(timestmpudp)
+    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(timestmpudp[3]) + ":" + str(timestmpudp[4]) + ":" + str(timestmpudp[5]) + " GMT, " + str(timestmpudp[1]) + "/" + str(timestmpudp[2]) + "/" + str(timestmpudp[0]))
   
   # Print ICMP Type:
   # Check if ICMP is present in the packet
