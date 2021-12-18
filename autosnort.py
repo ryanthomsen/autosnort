@@ -53,29 +53,56 @@ def readP(singlepacket):
     print("ICMP Type: " + str(icmptype))
 
 
-def HelperMethods(pcap):
-  counter = 0
-  for data in pcap:
-    if counter <=100:
-      print(str(counter) + " : ")
-      readP(data)
-      counter +=1
-      print("\n\n")
-  
-def RuleMaker(singlepacket):
+def RuleMaker(singlepacket) -> list:
   suggestion = ""
+  rule_list = []
   if TCP in singlepacket:
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
     if tcpsourceport == 1337:
-      suggestion += "drop TCP " + singlepacket[IP].src + ' 1337 -> any any (msg: "Suspicious Port"; sid ' + str(SID_START + 1) + ")\n"
+      suggestion += "drop TCP " + \
+          singlepacket[IP].src + \
+          ' 1337 -> any any (msg: "Suspicious activity on Port 1337"; sid ' + \
+          str(SID_START + 1) + ")\n"
+      rule_list.append(suggestion)
     if tcpdestport == 1337:
-      suggestion += "drop TCP any any -> " + singlepacket[IP].src + ' 1337 (msg: "Suspicious Port"; sid ' + str(SID_START + 2) + ")\n"
+      suggestion += "drop TCP any any -> " + \
+          singlepacket[IP].src + \
+          ' 1337 (msg: "Suspicious Port activity on 1337"; sid ' + \
+          str(SID_START + 2) + ")\n"
+      rule_list.append(suggestion)
+  #Return the rules
+  return rule_list
+
+def HelperMethods(pcap):
+  counter = 0
+  snort_rules = []
+  occurences = []
+  for data in pcap:
+    rule_list = []
+    print(str(counter) + " : ")
+    readP(data)
+    rule_list = RuleMaker(data)
+    for rule in rule_list:
+      if rule not in snort_rules:
+        snort_rules.append(rule)
+        occurences.append(1)
+      elif rule in snort_rules:
+        occurences[(snort_rules.index(rule))] += 1
+
+    counter +=1
+    print("\n\n")
+  print("Snort Rule Suggestions: ")
+  for index in range(0, len(snort_rules), 1):
+    print(snort_rules[index])
+    print("# of Packets Flagged: " + str(occurences[index]))
+    print("______________________________________________")
+  
 
 ### MAIN FUNCTION ###
 def main():
   #file_name = sys.argv[1]
-  file_name = "Project test.pcapng"
+  file_name = "1337 nc.pcap"
   # Check if pcap file exists
   # if os.path.isfile(file_name):
   if os.path.isfile(file_name):
