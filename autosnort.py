@@ -10,6 +10,9 @@ from scapy.layers.http import *
 
 import getopt
 
+#MAGIC NUMBERS
+SID_START = 1000000
+
 ### HELPER FUNCTIONS (IF NECESSARY) ###
 def readP(singlepacket):
   # Print IP Layer Rules
@@ -59,7 +62,15 @@ def HelperMethods(pcap):
       counter +=1
       print("\n\n")
   
-  
+def RuleMaker(singlepacket):
+  suggestion = ""
+  if TCP in singlepacket:
+    tcpsourceport = singlepacket[TCP].sport
+    tcpdestport = singlepacket[TCP].dport
+    if tcpsourceport == 1337:
+      suggestion += "drop TCP " + singlepacket[IP].src + ' 1337 -> any any (msg: "Suspicious Port"; sid ' + str(SID_START + 1) + ")\n"
+    if tcpdestport == 1337:
+      suggestion += "drop TCP any any -> " + singlepacket[IP].src + ' 1337 (msg: "Suspicious Port"; sid ' + str(SID_START + 2) + ")\n"
 
 ### MAIN FUNCTION ###
 def main():
@@ -75,8 +86,7 @@ def main():
   #open_file = open(file_name)
   HelperMethods(scapy_cap)
   #open_file.close()
-
-
+    
 ### DUNDER CHECK ###
 if __name__ == "__main__":
   main()
