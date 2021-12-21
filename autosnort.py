@@ -26,7 +26,7 @@ def readP(singlepacket):
     print("IP Source: " + str(ipsource) + " | IP Dest: " + str(ipdest))
     if not EPOCH:
       timestamp = gmtime(timestamp)
-      print("Time: " + str(timestamp[3]) + ":" + str(timestamp[4]) + ":" + str(timestamp[5]) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + "/" + str(timestamp[0]))
+      print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
     elif EPOCH:
       print("Epoch Time: " + timestamp)
 
@@ -38,9 +38,7 @@ def readP(singlepacket):
     timestmptcp = singlepacket.time
     #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
     #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
-    print(timestmptcp)
     timestmptcp = gmtime(timestmptcp)
-    print(timestmptcp)
     print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport))
 
     # Print HTTP Request Type
