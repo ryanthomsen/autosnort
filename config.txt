@@ -3,3 +3,4 @@
 include_all_packets = False
 include_packet_numbers_in_rule_suggestions = False
 
+EPOCH = False
