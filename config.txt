@@ -1,6 +1,12 @@
 ### Use this file to change any settings and customize how autosnort reads pcap files and outputs data
 
+#Ignore Subdomain
+Ingore = False
+SubDomain = 192.0.0/24
+
+#Futher Config Settings
 include_all_packets = False
 include_PKT_numbers = False
 
+#Display in Epoch Time instead of GM Time
 EPOCH = False
