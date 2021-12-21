@@ -15,9 +15,27 @@ SID_START = 1000000
 BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024, 3150, 3700, 4950, 6346, 6400, 6667, 6670, 12345,
              12346, 16660, 18753, 20034, 20432, 20433, 27374, 27444, 27665, 30100, 31335, 31337, 33270, 33567, 33568, 40421, 60008, 65000]
 EPOCH = False
+packet_list = []
+
+#Object to make reading packets easier
+class pigget:
+  def __init__(self, singlepacket):
+      if IP in singlepacket:
+        self.ipsource = singlepacket[IP].src
+        self.ipdest = singlepacket[IP].dst
+        self.timestamp = singlepacket.time
+      if TCP in singlepacket:
+        self.tcpsourceport = singlepacket[TCP].sport
+        self.tcpdestport = singlepacket[TCP].dport
+        self.timestmptcp = singlepacket.time
+        if self.tcpdestport == 80:
+          if singlepacket.haslayer(HTTPRequest):  # Checks if packet has payload
+            #rawload = singlepacket[0][0][Raw].load
+            print("HTTP Request Type: " + str(singlepacket[HTTPRequest].Method))
 
 
 ### HELPER FUNCTIONS ###
+
 def readP(singlepacket):
   # Print IP source and destination
 	# Check if the IP layer is present in the packet
@@ -37,10 +55,6 @@ def readP(singlepacket):
   if TCP in singlepacket:
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
-    timestmptcp = singlepacket.time
-    #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
-    #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
-    timestmptcp = gmtime(timestmptcp)
     print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport))
 
     # Print HTTP Request Type
