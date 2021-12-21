@@ -14,7 +14,9 @@ from time import gmtime, localtime
 SID_START = 1000000
 BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024, 3150, 3700, 4950, 6346, 6400, 6667, 6670, 12345,
              12346, 16660, 18753, 20034, 20432, 20433, 27374, 27444, 27665, 30100, 31335, 31337, 33270, 33567, 33568, 40421, 60008, 65000]
-EPOCH == False
+EPOCH = False
+
+
 ### HELPER FUNCTIONS ###
 def readP(singlepacket):
   # Print IP source and destination
@@ -28,7 +30,7 @@ def readP(singlepacket):
       timestamp = gmtime(timestamp)
       print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
     elif EPOCH:
-      print("Epoch Time: " + timestamp)
+      print("Epoch Time: " + str(timestamp))
 
   # Print TCP source port and destination port
   # Check if TCP is present in the packet
