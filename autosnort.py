@@ -19,6 +19,7 @@ BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024
 include_all_packets = False
 include_PKT_numbers = False
 EPOCH = False
+Enable_WhiteList = False
 
 #Read config rules
 
@@ -32,6 +33,7 @@ def loadP(singlepacket):
   custom_packet = Pigget(singlepacket)
   return custom_packet
 
+
 def readP(singlepacket):
   # Print IP source and destination
 	# Check if the IP layer is present in the packet
@@ -42,7 +44,12 @@ def readP(singlepacket):
     print("IP Source: " + str(ipsource) + " | IP Dest: " + str(ipdest))
     if not EPOCH:
       timestamp = gmtime(timestamp)
+<<<<<<< Updated upstream
       print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
+=======
+      print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(
+          timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
+>>>>>>> Stashed changes
     elif EPOCH:
       print("Epoch Time: " + str(timestamp))
 
@@ -51,7 +58,8 @@ def readP(singlepacket):
   if TCP in singlepacket:
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
-    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport))
+    print("TCP Source Port: " + str(tcpsourceport) +
+          " | TCP Dest Port: " + str(tcpdestport))
 
     # Print HTTP Request Type
     # Check if HTTP is present in the packet
@@ -71,15 +79,17 @@ def readP(singlepacket):
   if DNSRR in singlepacket:
     hostaddr = singlepacket[DNSRR].rdata
     #recordtype = singlepacket[DNSRR].qtype
-    print("DNS Host Address: " + str(hostaddr)) #+ " | TCP Dest Port: " + str(recordtype))
-  
+    # + " | TCP Dest Port: " + str(recordtype))
+    print("DNS Host Address: " + str(hostaddr))
+
   # Print UDP source port and UDP destination port
   # Check if UDP is present in the packet
   if UDP in singlepacket:
     udpsrcport = singlepacket[UDP].sport
     udpdestport = singlepacket[UDP].dport
-    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport))
-  
+    print("UDP Source Port: " + str(udpsrcport) +
+          " | UDP Dest Port: " + str(udpdestport))
+
   # Print ICMP Type:
   # Check if ICMP is present in the packet
   if ICMP in singlepacket:
@@ -87,6 +97,8 @@ def readP(singlepacket):
     print("ICMP Type: " + str(icmptype))
 
 # Method to suggest snort rules based on packet information
+
+
 def RuleMaker(singlepacket) -> list:
   suggestion = ""
   rule_list = []
@@ -98,13 +110,16 @@ def RuleMaker(singlepacket) -> list:
 
     #Checks if suspicious ports
     if tcpsourceport in BAD_PORTS:
-      suggestion = "drop TCP " + str(singlepacket[IP].src) + ' ' + str(tcpsourceport) +' -> any any (msg: "Suspicious activity on Port ' + str(tcpsourceport) + '"; sid ' + str(SID_START + 1) + ")\n"
+      suggestion = "drop TCP " + str(singlepacket[IP].src) + ' ' + str(
+          tcpsourceport) + ' -> any any (msg: "Suspicious activity on Port ' + str(tcpsourceport) + '"; sid ' + str(SID_START + 1) + ")\n"
       rule_list.append(suggestion)
     if tcpdestport == BAD_PORTS:
-      suggestion = "drop TCP any any -> " + str(singlepacket[IP].src) + ' ' + str(tcpdestport) + ' (msg: "Suspicious Port activity on  ' + str(tcpdestport) + '"; sid ' + str(SID_START + 2) + ")\n"
+      suggestion = "drop TCP any any -> " + str(singlepacket[IP].src) + ' ' + str(
+          tcpdestport) + ' (msg: "Suspicious Port activity on  ' + str(tcpdestport) + '"; sid ' + str(SID_START + 2) + ")\n"
       rule_list.append(suggestion)
   #Return the rules
   return rule_list
+
 
 def HelperMethods(pcap):
   counter = 0
@@ -122,7 +137,7 @@ def HelperMethods(pcap):
       elif rule in snort_rules:
         occurences[(snort_rules.index(rule))] += 1
 
-    counter +=1
+    counter += 1
     print("\n\n")
   print("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
@@ -131,9 +146,16 @@ def HelperMethods(pcap):
     print("______________________________________________")
   for packet in pcap:
     packet_list.append(loadP(packet))
+<<<<<<< Updated upstream
   
   print(packet_list)
   
+=======
+  for item in packet_list:
+    print(item)
+    input()
+
+>>>>>>> Stashed changes
 
 ### MAIN FUNCTION ###
 def main():
@@ -151,7 +173,8 @@ def main():
   HelperMethods(scapy_cap)
 
   #open_file.close()
-    
+
+
 ### DUNDER CHECK ###
 if __name__ == "__main__":
   main()
