@@ -3,6 +3,7 @@
 ### IMPORT STATEMENTS ###
 import sys
 import os
+from pigget import *
 from time import gmtime
 from scapy.all import *
 from scapy.layers.inet import IP, UDP, TCP, ICMP
@@ -24,24 +25,12 @@ EPOCH = False
 
 packet_list = []
 
-#Object to make reading packets easier
-class pigget:
-  def __init__(self, singlepacket):
-      if IP in singlepacket:
-        self.ipsource = singlepacket[IP].src
-        self.ipdest = singlepacket[IP].dst
-        self.timestamp = singlepacket.time
-      if TCP in singlepacket:
-        self.tcpsourceport = singlepacket[TCP].sport
-        self.tcpdestport = singlepacket[TCP].dport
-        self.timestmptcp = singlepacket.time
-        if self.tcpdestport == 80:
-          if singlepacket.haslayer(HTTPRequest):  # Checks if packet has payload
-            #rawload = singlepacket[0][0][Raw].load
-            print("HTTP Request Type: " + str(singlepacket[HTTPRequest].Method))
-
 
 ### HELPER FUNCTIONS ###
+
+def loadP(singlepacket):
+  custom_packet = Pigget(singlepacket)
+  return custom_packet
 
 def readP(singlepacket):
   # Print IP source and destination
@@ -148,6 +137,10 @@ def HelperMethods(pcap):
     print(snort_rules[index])
     print("# of Packets Flagged: " + str(occurences[index]))
     print("______________________________________________")
+  for packet in pcap:
+    packet_list.append(loadP(packet))
+  
+  print(packet_list)
   
 
 ### MAIN FUNCTION ###
@@ -164,6 +157,7 @@ def main():
     sys.exit(1)
   #open_file = open(file_name)
   HelperMethods(scapy_cap)
+
   #open_file.close()
     
 ### DUNDER CHECK ###
