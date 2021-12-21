@@ -14,7 +14,7 @@ from time import gmtime, localtime
 SID_START = 1000000
 BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024, 3150, 3700, 4950, 6346, 6400, 6667, 6670, 12345,
              12346, 16660, 18753, 20034, 20432, 20433, 27374, 27444, 27665, 30100, 31335, 31337, 33270, 33567, 33568, 40421, 60008, 65000]
-
+EPOCH == False
 ### HELPER FUNCTIONS ###
 def readP(singlepacket):
   # Print IP source and destination
@@ -22,19 +22,26 @@ def readP(singlepacket):
   if IP in singlepacket:
     ipsource = singlepacket[IP].src
     ipdest = singlepacket[IP].dst
+    timestamp = singlepacket.time
     print("IP Source: " + str(ipsource) + " | IP Dest: " + str(ipdest))
+    if not EPOCH:
+      timestamp = gmtime(timestamp)
+      print("Time: " + str(timestamp[3]) + ":" + str(timestamp[4]) + ":" + str(timestamp[5]) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + "/" + str(timestamp[0]))
+    elif EPOCH:
+      print("Epoch Time: " + timestamp)
 
   # Print TCP source port and destination port
   # Check if TCP is present in the packet
   if TCP in singlepacket:
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
-    timestmptcp = singlepacket[TCP].time
-    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
+    timestmptcp = singlepacket.time
+    #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(round(timestmptcp * 100) / 100))
     #print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(gmtime(timestmptcp)))
-
+    print(timestmptcp)
     timestmptcp = gmtime(timestmptcp)
-    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport) + " | time: " + str(timestmptcp[1]) + str(timestmptcp[2]) + str(timestmptcp[0]) + ", " + str(timestmptcp[3]) + str(timestmptcp[4]) + str(timestmptcp[5]))
+    print(timestmptcp)
+    print("TCP Source Port: " + str(tcpsourceport) + " | TCP Dest Port: " + str(tcpdestport))
 
     # Print HTTP Request Type
     # Check if HTTP is present in the packet
@@ -65,7 +72,7 @@ def readP(singlepacket):
     #print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(round(timestmpudp * 100) / 100))
 
     timestmpudp = gmtime(timestmpudp)
-    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport) + " | time: " + str(timestmpudp[3]) + ":" + str(timestmpudp[4]) + ":" + str(timestmpudp[5]) + " GMT, " + str(timestmpudp[1]) + "/" + str(timestmpudp[2]) + "/" + str(timestmpudp[0]))
+    print("UDP Source Port: " + str(udpsrcport) + " | UDP Dest Port: " + str(udpdestport))
   
   # Print ICMP Type:
   # Check if ICMP is present in the packet
@@ -73,7 +80,9 @@ def readP(singlepacket):
     icmptype = singlepacket[ICMP].type
     timestmpicmp = singlepacket[ICMP].time
     #print("ICMP Type: " + str(icmptype) + " | time: " + str(round((timestmpicmp * 100) /100))
-    print("ICMP Type: " + str(icmptype) + " | time: " + str(gmtime(timestmpicmp)))
+    #print("ICMP Type: " + str(icmptype) + " | time: " + str(gmtime(timestmpicmp)))
+    timestmpicmp = gmtime(timestmpicmp)
+    print("ICMP Type: " + str(icmptype))
 
 # Method to suggest snort rules based on packet information
 def RuleMaker(singlepacket) -> list:
