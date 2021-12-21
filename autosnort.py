@@ -41,7 +41,7 @@ def readP(singlepacket):
     timestamp = singlepacket.time
     print("IP Source: " + str(ipsource) + " | IP Dest: " + str(ipdest))
     if not EPOCH:
-      timestamp = gmtime(timestamp)
+      timestamp = int(gmtime(timestamp))
       print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
     elif EPOCH:
       print("Epoch Time: " + str(timestamp))
@@ -131,9 +131,12 @@ def HelperMethods(pcap):
     print("______________________________________________")
   for packet in pcap:
     packet_list.append(loadP(packet))
+  for item in packet_list:
+    print(item)
+    input()
   
-  print(packet_list)
-  
+
+
 
 ### MAIN FUNCTION ###
 def main():

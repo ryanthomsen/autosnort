@@ -10,6 +10,9 @@ from scapy.layers.dns import DNS, DNSQR, DNSRR
 from scapy.layers.http import *
 from time import gmtime, localtime
 
+
+#MAGIC NUMBERS
+GM_T = True
 #Object to make reading packets easier
 class Pigget:
     def __init__(self, singlepacket):
@@ -38,42 +41,48 @@ class Pigget:
             self.hostaddr = singlepacket[DNSRR].rdata
             #self.recordtype = singlepacket[DNSRR].qtype
 
-
-    def print(self, GM_T):
+    def __str__(self):
+        result = ''
         # Print IP source and destination
         # Check if the IP layer is present in the packet
-        if self.ipsource & self.ipdest:
-            print("IP Source: " + str(self.ipsource) + " | IP Dest: " + str(self.ipdest))
-        if self.timestamp:
+        if 'self.ipsource' in locals() and 'self.ipdest' in locals():
+            result += ("IP Source: " + str(self.ipsource) + " | IP Dest: " + str(self.ipdest) + "\n")
+        if 'self.timestamp' in locals():
             if GM_T:
                 self.timestamp = gmtime(self.timestamp)
-                print("Time: " + str(self.timestamp[3]).zfill(2) + ":" + str(self.timestamp[4]).zfill(2) + ":" + str(self.timestamp[5]).zfill(2) + " GMT, " + str(self.timestamp[1]) + "/" + str(self.timestamp[2]) + " /" + str(self.timestamp[0]))
+                result += ("Time: " + str(self.timestamp[3]).zfill(2) + ":" + str(self.timestamp[4]).zfill(2) + ":" + str(self.timestamp[5]).zfill(
+                    2) + " GMT, " + str(self.timestamp[1]) + "/" + str(self.timestamp[2]) + " /" + str(self.timestamp[0]) + "\n")
             elif not GM_T:
-                print("Epoch Time: " + str(self.timestamp))
+                result += ("Epoch Time: " + str(self.timestamp) + "\n")
         # Print TCP source port and destination port
         # Check if TCP is present in the packet
-        if self.tcpdestport and self.tcpsourceport:
-            print("TCP Source Port: " + str(self.tcpsourceport) + " | TCP Dest Port: " + str(self.tcpdestport))
+        if 'self.tcpdestport' in locals() and 'self.tcpsourceport' in locals():
+            result += ("TCP Source Port: " + str(self.tcpsourceport) +
+                       " | TCP Dest Port: " + str(self.tcpdestport) + "\n")
             # Print HTTP Request Type
             # Check if HTTP is present in the packet
-            if self.http_method:  # Checks if packet has payload
+            if 'self.http_method' in locals():  # Checks if packet has payload
                 #rawload = singlepacket[0][0][Raw].load
-                print("HTTP Request Type: " + str(self.http_method))
+                result += ("HTTP Request Type: " +
+                           str(self.http_method) + "\n")
         # Print DNS Hostname
         # Check if DNS is present in the packet
-        if self.hostname:
-            print("DNS HostName: " + str(self.hostname))
+        if 'self.hostname' in locals():
+            result += ("DNS HostName: " + str(self.hostname) + "\n")
         # Print DNS Host Address
         # Check if Scapy is able to load additional DNS information
-        if self.hostaddr:
-            print("DNS Host Address: " + str(self.hostaddr)) #+ " | TCP Dest Port: " + str(self.recordtype))
+        if 'self.hostaddr' in locals():
+            # + " | TCP Dest Port: " + str(self.recordtype))
+            result += ("DNS Host Address: " + str(self.hostaddr) + "\n")
         
         # Print UDP source port and UDP destination port
         # Check if UDP is present in the packet
-        if self.udpdestport and self.udpsrcport:
-            print("UDP Source Port: " + str(self.udpsrcport) + " | UDP Dest Port: " + str(self.udpdestport))
+        if 'self.udpdestport' in locals() and 'self.udpsrcport' in locals():
+            result += ("UDP Source Port: " + str(self.udpsrcport) +
+                       " | UDP Dest Port: " + str(self.udpdestport) + "\n")
         
         # Print ICMP Type:
         # Check if ICMP is present in the packet
-        if self.icmptype:
-            print("ICMP Type: " + str(self.icmptype))
+        if 'self.icmptype' in locals():
+            result += ("ICMP Type: " + str(self.icmptype) + "\n")
+        return result
