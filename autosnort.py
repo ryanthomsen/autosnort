@@ -14,7 +14,14 @@ from time import gmtime, localtime
 SID_START = 1000000
 BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024, 3150, 3700, 4950, 6346, 6400, 6667, 6670, 12345,
              12346, 16660, 18753, 20034, 20432, 20433, 27374, 27444, 27665, 30100, 31335, 31337, 33270, 33567, 33568, 40421, 60008, 65000]
+#Output config rules
+include_all_packets = False
+include_PKT_numbers = False
 EPOCH = False
+
+#Read config rules
+
+
 packet_list = []
 
 #Object to make reading packets easier
