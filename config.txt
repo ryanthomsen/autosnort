@@ -10,3 +10,6 @@ include_PKT_numbers = False
 
 #Display in Epoch Time instead of GM Time
 EPOCH = False
+
+#Minimum packets per second to determine a scanning behavior was probably not human
+scan_timing_threshold = 0.1
