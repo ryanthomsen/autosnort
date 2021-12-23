@@ -19,8 +19,12 @@ BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024
 include_all_packets = False
 include_PKT_numbers = False
 EPOCH = False
+<<<<<<< Updated upstream
 Enable_WhiteList = False
 
+=======
+PRINTPACKET = True
+>>>>>>> Stashed changes
 #Read config rules
 
 
@@ -29,10 +33,11 @@ packet_list = []
 
 ### HELPER FUNCTIONS ###
 
-def loadP(singlepacket):
-  custom_packet = Pigget(singlepacket)
+def loadP(singlepacket, packetnum):
+  custom_packet = Pigget(singlepacket, packetnum)
   return custom_packet
 
+<<<<<<< Updated upstream
 
 def readP(singlepacket):
   # Print IP source and destination
@@ -96,6 +101,8 @@ def readP(singlepacket):
     icmptype = singlepacket[ICMP].type
     print("ICMP Type: " + str(icmptype))
 
+=======
+>>>>>>> Stashed changes
 # Method to suggest snort rules based on packet information
 
 
@@ -120,30 +127,46 @@ def RuleMaker(singlepacket) -> list:
   #Return the rules
   return rule_list
 
+<<<<<<< Updated upstream
 
 def HelperMethods(pcap):
+=======
+def printList(list):
+    for item in list:
+      print(item)
+
+def AnalayzePkts(pcap):
+>>>>>>> Stashed changes
   counter = 0
   snort_rules = []
   occurences = []
-  for data in pcap:
+  for packet in pcap:
     rule_list = []
-    print(str(counter) + " : ")
-    readP(data)
-    rule_list = RuleMaker(data)
+    rule_list = RuleMaker(packet)
     for rule in rule_list:
       if rule not in snort_rules:
         snort_rules.append(rule)
         occurences.append(1)
       elif rule in snort_rules:
         occurences[(snort_rules.index(rule))] += 1
+<<<<<<< Updated upstream
 
     counter += 1
     print("\n\n")
+=======
+    counter +=1
+    packet_list.append(loadP(packet, counter))
+  if PRINTPACKET:
+    printList(packet_list)
+
+  print("\n\n")
+>>>>>>> Stashed changes
   print("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
     print(snort_rules[index])
     print("# of Packets Flagged: " + str(occurences[index]))
     print("______________________________________________")
+<<<<<<< Updated upstream
   for packet in pcap:
     packet_list.append(loadP(packet))
 <<<<<<< Updated upstream
@@ -154,27 +177,38 @@ def HelperMethods(pcap):
   for item in packet_list:
     print(item)
     input()
+=======
+    
+  
+
+>>>>>>> Stashed changes
 
 >>>>>>> Stashed changes
 
 ### MAIN FUNCTION ###
 def main():
-  #file_name = sys.argv[1]
-  file_name = "1337 nc.pcap"
+  file_name = sys.argv[1]
+  #file_name = "1337 nc.pcap"
   #file_name = "Project test.pcapng"
   # Check if pcap file exists
-  # if os.path.isfile(file_name):
   if os.path.isfile(file_name):
     scapy_cap = rdpcap(file_name)
   else:
     print("Error:", file_name, "doesn't not exist.")
     sys.exit(1)
+<<<<<<< Updated upstream
   #open_file = open(file_name)
   HelperMethods(scapy_cap)
 
   #open_file.close()
 
 
+=======
+  AnalayzePkts(scapy_cap)
+  print("Press any key to end.")
+  input()
+    
+>>>>>>> Stashed changes
 ### DUNDER CHECK ###
 if __name__ == "__main__":
   main()

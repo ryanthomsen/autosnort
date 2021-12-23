@@ -1,12 +1,19 @@
 ### Use this file to change any settings and customize how autosnort reads pcap files and outputs data
 
 #Ignore Subdomain
-Ingore = False
-SubDomain = 192.0.0/24
+Enable_WhiteList = False
 
+PRINTPACKET = True
 #Futher Config Settings
 include_all_packets = False
 include_PKT_numbers = False
 
 #Display in Epoch Time instead of GM Time
 EPOCH = False
+
+#SID_START should equal the sid of your last snort rule
+SID_START = 1000000
+
+#List of Flagged Ports
+BAD_PORTS = [1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024, 3150, 3700, 4950, 6346, 6400, 6667, 6670, 12345,
+             12346, 16660, 18753, 20034, 20432, 20433, 27374, 27444, 27665, 30100, 31335, 31337, 33270, 33567, 33568, 40421, 60008, 65000]
