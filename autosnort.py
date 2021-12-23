@@ -66,9 +66,9 @@ def HelperMethods(pcap):
   counter = 0
   snort_rules = []
   occurences = []
-  for data in pcap:
+  for packet in pcap:
     rule_list = []
-    rule_list = RuleMaker(data)
+    rule_list = RuleMaker(packet)
     for rule in rule_list:
       if rule not in snort_rules:
         snort_rules.append(rule)
@@ -89,8 +89,8 @@ def HelperMethods(pcap):
 
 ### MAIN FUNCTION ###
 def main():
-  #file_name = sys.argv[1]
-  file_name = "1337 nc.pcap"
+  file_name = sys.argv[1]
+  #file_name = "1337 nc.pcap"
   #file_name = "Project test.pcapng"
   # Check if pcap file exists
   # if os.path.isfile(file_name):
