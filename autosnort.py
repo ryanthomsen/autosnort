@@ -3,6 +3,7 @@
 ### IMPORT STATEMENTS ###
 import sys
 import os
+import socket
 from pigget import *
 from time import gmtime
 from scapy.all import *
@@ -20,6 +21,7 @@ include_all_packets = False
 include_PKT_numbers = False
 EPOCH = False
 Enable_WhiteList = False
+PRINTPCKT = True
 
 #Read config rules
 
@@ -29,76 +31,15 @@ packet_list = []
 
 ### HELPER FUNCTIONS ###
 
-def loadP(singlepacket):
-  custom_packet = Pigget(singlepacket)
+def loadP(singlepacket, counter):
+  custom_packet = Pigget(singlepacket, counter)
   return custom_packet
 
-
-def readP(singlepacket):
-  # Print IP source and destination
-	# Check if the IP layer is present in the packet
-  if IP in singlepacket:
-    ipsource = singlepacket[IP].src
-    ipdest = singlepacket[IP].dst
-    timestamp = singlepacket.time
-    print("IP Source: " + str(ipsource) + " | IP Dest: " + str(ipdest))
-    if not EPOCH:
-      timestamp = gmtime(timestamp)
-<<<<<<< Updated upstream
-      print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
-=======
-      print("Time: " + str(timestamp[3]).zfill(2) + ":" + str(timestamp[4]).zfill(2) + ":" + str(
-          timestamp[5]).zfill(2) + " GMT, " + str(timestamp[1]) + "/" + str(timestamp[2]) + " /" + str(timestamp[0]))
->>>>>>> Stashed changes
-    elif EPOCH:
-      print("Epoch Time: " + str(timestamp))
-
-  # Print TCP source port and destination port
-  # Check if TCP is present in the packet
-  if TCP in singlepacket:
-    tcpsourceport = singlepacket[TCP].sport
-    tcpdestport = singlepacket[TCP].dport
-    print("TCP Source Port: " + str(tcpsourceport) +
-          " | TCP Dest Port: " + str(tcpdestport))
-
-    # Print HTTP Request Type
-    # Check if HTTP is present in the packet
-    if tcpdestport == 80:
-      if singlepacket.haslayer(HTTPRequest):  # Checks if packet has payload
-        #rawload = singlepacket[0][0][Raw].load
-        print("HTTP Request Type: " + str(singlepacket[HTTPRequest].Method))
-
-  # Print DNS Hostname
-	# Check if DNS is present in the packet
-  if DNS in singlepacket:
-    hostname = singlepacket[DNSQR].qname
-    print("DNS HostName: " + str(hostname))
-
-  # Print DNS Host Address
-  # Check if Scapy is able to load additional DNS information
-  if DNSRR in singlepacket:
-    hostaddr = singlepacket[DNSRR].rdata
-    #recordtype = singlepacket[DNSRR].qtype
-    # + " | TCP Dest Port: " + str(recordtype))
-    print("DNS Host Address: " + str(hostaddr))
-
-  # Print UDP source port and UDP destination port
-  # Check if UDP is present in the packet
-  if UDP in singlepacket:
-    udpsrcport = singlepacket[UDP].sport
-    udpdestport = singlepacket[UDP].dport
-    print("UDP Source Port: " + str(udpsrcport) +
-          " | UDP Dest Port: " + str(udpdestport))
-
-  # Print ICMP Type:
-  # Check if ICMP is present in the packet
-  if ICMP in singlepacket:
-    icmptype = singlepacket[ICMP].type
-    print("ICMP Type: " + str(icmptype))
+def printlist(list):
+  for item in list:
+    print(item)
 
 # Method to suggest snort rules based on packet information
-
-
 def RuleMaker(singlepacket) -> list:
   suggestion = ""
   rule_list = []
@@ -127,8 +68,6 @@ def HelperMethods(pcap):
   occurences = []
   for data in pcap:
     rule_list = []
-    print(str(counter) + " : ")
-    readP(data)
     rule_list = RuleMaker(data)
     for rule in rule_list:
       if rule not in snort_rules:
@@ -136,26 +75,17 @@ def HelperMethods(pcap):
         occurences.append(1)
       elif rule in snort_rules:
         occurences[(snort_rules.index(rule))] += 1
-
     counter += 1
-    print("\n\n")
+    packet_list.append(loadP(packet, counter))
+  if(PRINTPCKT):
+    printlist(packet_list)
+  print("\n\n")
   print("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
     print(snort_rules[index])
     print("# of Packets Flagged: " + str(occurences[index]))
     print("______________________________________________")
-  for packet in pcap:
-    packet_list.append(loadP(packet))
-<<<<<<< Updated upstream
-  
-  print(packet_list)
-  
-=======
-  for item in packet_list:
-    print(item)
-    input()
 
->>>>>>> Stashed changes
 
 ### MAIN FUNCTION ###
 def main():
