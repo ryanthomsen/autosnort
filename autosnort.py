@@ -24,6 +24,8 @@ EPOCH = False
 
 #Read config rules
 scan_timing_threshold = 0.1
+private_port_ranges = ["1025-65535"]
+whitelisted_ip_addresses = []
 
 #Misc vars
 packet_list = []
@@ -31,6 +33,29 @@ pinged_port_list = {}
 
 
 ### HELPER FUNCTIONS ###
+
+def port_range_check(port_num) -> int:
+  counter = 0
+  while counter < len(private_port_ranges):
+    min_val = 0
+    max_val = 0
+    delim = 0
+    entry_str = private_port_ranges[counter]
+    #checks if the entry is a range, or single int
+    if "-" in entry_str:
+      delim = entry_str.index("-")
+      min_val = int(entry_str[:delim])
+      max_val = int(entry_str[delim+1:])
+      #checks if the port is in the range
+      if port_num in range(min_val, max_val):
+        return False
+      else:
+        counter += 1
+    else:
+      if port_num == int(entry_str):
+        return False
+      else: counter += 1
+  return True
 
 """ def loadP(singlepacket):
   custom_packet = Pigget(singlepacket)
@@ -118,10 +143,11 @@ def RuleMaker(singlepacket):
     
     #Checks for a variety of ports being pinged too often (NMAP scan)
     #Adds packet to dictionary
-    str_port_add = (str(tcpdestport) + "-" + str(singlepacket[IP].time))
-    if tcpsourceaddr in pinged_port_list:
-      pinged_port_list[tcpsourceaddr].append(str_port_add)
-    else: pinged_port_list[tcpsourceaddr] = [str_port_add]
+    if port_range_check(tcpdestport):
+      str_port_add = (str(tcpdestport) + "-" + str(singlepacket[IP].time))
+      if tcpsourceaddr in pinged_port_list:
+        pinged_port_list[tcpsourceaddr].append(str_port_add)
+      else: pinged_port_list[tcpsourceaddr] = [str_port_add]
 
       #Every 5 packets, checks if 
     #Checks for swapped DHCP ports

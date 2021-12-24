@@ -4,6 +4,11 @@
 Ingore = False
 SubDomain = 192.0.0/24
 
+#Port ranges specified in whitelist.txt will be considered private and ignored when looking for port scanning
+#By default autosnort considers all ports above 1024 to be private
+#We don't recommend setting any values outside the range of 1025-49151
+use_port_range_whitelist = False
+
 #Futher Config Settings
 include_all_packets = False
 include_PKT_numbers = False
@@ -13,3 +18,6 @@ EPOCH = False
 
 #Minimum packets per second to determine a scanning behavior was probably not human
 scan_timing_threshold = 0.1
+
+#Private port ranges (ignore a destination port when checking for NMAP scans. We don't recommend setting below 1024 or above 49151)
+private_port_ranges = ["1025-65535"]
