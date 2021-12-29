@@ -26,11 +26,12 @@ EPOCH = False
 scan_timing_threshold = 0.1
 private_port_ranges = ["1025-65535"]
 whitelisted_ip_addresses = []
+nmap_unique_ports = 15
+nmap_percentage_of_violations = 0.75
 
 #Misc vars
 packet_list = []
 pinged_port_list = {}
-
 
 ### HELPER FUNCTIONS ###
 
@@ -129,9 +130,10 @@ def RuleMaker(singlepacket):
     tcpsourceport = singlepacket[TCP].sport
     tcpdestport = singlepacket[TCP].dport
     tcpsourceaddr = singlepacket[IP].src
-    #tcpdestaddr = singlepacket[IP].dst
+    tcpdestaddr = singlepacket[IP].dst
     window_size = singlepacket[TCP].window
     str_port_add = ""
+    delim01 = 0
 
     #Checks if suspicious ports
     if tcpsourceport in BAD_PORTS:
@@ -144,12 +146,12 @@ def RuleMaker(singlepacket):
     #Checks for a variety of ports being pinged too often (NMAP scan)
     #Adds packet to dictionary
     if port_range_check(tcpdestport):
-      str_port_add = (str(tcpdestport) + "-" + str(singlepacket[IP].time))
-      if tcpsourceaddr in pinged_port_list:
-        pinged_port_list[tcpsourceaddr].append(str_port_add)
-      else: pinged_port_list[tcpsourceaddr] = [str_port_add]
-
-      #Every 5 packets, checks if 
+      source_dest_pair = tcpsourceaddr + ":" + tcpdestaddr
+      str_port_add = (str(tcpdestport) + "-" + str(singlepacket.time))
+      if source_dest_pair in pinged_port_list:
+        pinged_port_list[source_dest_pair].append(str_port_add)
+      else: pinged_port_list[source_dest_pair] = [str_port_add]
+    
     #Checks for swapped DHCP ports
     #Checks for unencrypted traffic
     #Checks for failed logins
@@ -159,8 +161,124 @@ def RuleMaker(singlepacket):
     if window_size > 65535:
       suggestion = ""
       rule_list.append(suggestion)
+
+  #UDP rules
+  #Bulk NMAP info for UDP ports
+  if UDP in singlepacket:
+    udpdestport = singlepacket[UDP].dport
+    udpsourceaddr = singlepacket[IP].src
+    udpdestaddr = singlepacket[IP].dst
+
+
+    if port_range_check(udpdestport):
+      source_dest_pair = udpsourceaddr + ":" + udpdestaddr
+      str_port_add = (str(udpdestport) + "-" + str(singlepacket.time))
+      if source_dest_pair in pinged_port_list:
+        pinged_port_list[source_dest_pair].append(str_port_add)
+      else: pinged_port_list[source_dest_pair] = [str_port_add]
+
   #Return the rules
   return rule_list
+
+def substr_in_list(substr,inlist):
+  #takes in a list and a substring, and returns a l8st of occurances
+  #only if substring is at the beginning of the string
+  new_list = []
+  counter01 = 0
+  fullstr = ""
+  while counter01 < len(inlist):
+    fullstr = inlist[counter01]
+    if isinstance(inlist[counter01], str):
+      if substr in inlist[counter01] and inlist[counter01].index(substr) == 0:
+        new_list.append(fullstr)
+    counter01 += 1
+  return new_list
+
+def nmap_scan_check(PPL_list):
+  counter01 = 0
+  key_list = list(PPL_list)
+  val_list = list(PPL_list.values())
+  #print("\n" + str(val_list) + "___________\n")
+  #goes through list of IPs
+  while counter01 < len(key_list):
+    counter02 = 0
+    #If a port shows up more than twice, we remove all but the first and last occurances
+    #Goes through the list of ports
+    new_val_list = val_list[counter01]
+    while counter02 < len(val_list[counter01]):
+      current_port_string = val_list[counter01][counter02]
+      prt_str_delim = current_port_string.index("-")
+      this_port = current_port_string[:prt_str_delim+1]
+      #takes the prefix of each port and compares them to their occurrances in the list
+      port_occ_list = substr_in_list(this_port, new_val_list)
+      #if the occurrance is not identical to the first or last one, it gets sliced out
+      if len(port_occ_list) > 2 and current_port_string != port_occ_list[0] and current_port_string != port_occ_list[-1]:
+          new_val_list = new_val_list[:counter02] + new_val_list[counter02+1:]
+      else:
+        counter02 += 1
+    val_list[counter01] = new_val_list
+    counter01 += 1
+  #return val_list
+  counter03 = 0
+  while counter03 < len(val_list):
+    counter04 = 0
+    while counter04 < len(val_list[counter03]):
+      current_port_string = val_list[counter03][counter04]
+      time_stamp_delim = current_port_string.index(".")
+      val_list[counter03][counter04] = current_port_string[:time_stamp_delim+2]
+      counter04 += 1
+    counter03 += 1
+
+
+  #pinged_port_list = {}
+  #counter01 = 0
+  #while counter01 < len(key_list):
+    #current_key = key_list[counter01]
+    #current_val = val_list[counter01]
+    #pinged_port_list[current_key] = current_val
+    #counter01 += 1
+  
+  potential_nmap_scan_list = []
+  counter05 = 0
+  while counter05 < len(val_list):
+    counter06 = 0
+    ports_found = []
+    num_of_tmstmp_violations = 0
+    val_tmstmp_list = val_list[counter05]
+    total_tmstmp_length = len(val_tmstmp_list)
+    while counter06 < total_tmstmp_length:
+      tmstmp_diff = 0
+      full_string = val_tmstmp_list[counter06]
+      prt_tmstmp_delim = full_string.index("-")
+      port_str = full_string[:prt_tmstmp_delim]
+      tmstmp_str = full_string[prt_tmstmp_delim+1:]
+      if port_str not in ports_found:
+        ports_found.append(port_str)
+      if counter06 != 0:
+        prev_fullstr = val_tmstmp_list[counter06-1]
+        prev_delim = prev_fullstr.index("-")
+        prev_tmstmp = prev_fullstr[prev_delim+1:]
+        tmstmp_diff = float(tmstmp_str) - float(prev_tmstmp)
+        if tmstmp_diff <= scan_timing_threshold:
+          num_of_tmstmp_violations += 1
+      counter06 += 1
+    if len(ports_found) >= nmap_unique_ports and (total_tmstmp_length / num_of_tmstmp_violations) >= nmap_percentage_of_violations:
+      potential_nmap_scan_list.append(key_list[counter05])
+    counter05 += 1
+
+  if potential_nmap_scan_list != 0:
+    port_scan_rule_ret = []
+    counter07 = 0
+    while counter07 < len(potential_nmap_scan_list):
+      source_addr_ret = potential_nmap_scan_list[counter07][:(potential_nmap_scan_list[counter07].index(":"))]
+      dest_addr_ret = potential_nmap_scan_list[counter07][(potential_nmap_scan_list[counter07].index(":"))+1:]
+      port_scan_rule_ret.append("drop any " + source_addr_ret + " any -> " + dest_addr_ret + ' any (msg: "Known port-scanning address ' + source_addr_ret + '"; sid 1000001')
+      counter07 += 1
+  return port_scan_rule_ret
+
+
+
+
 
 def HelperMethods(pcap):
   counter = 0
@@ -180,6 +298,14 @@ def HelperMethods(pcap):
 
     counter +=1
     print("\n\n")
+  #adds port scan detection rules
+  counter01 = 0
+  scan_rules = nmap_scan_check(pinged_port_list)
+  while counter01 < len(scan_rules):
+    snort_rules.append(scan_rules[counter01])
+    occurences.append("N/A")
+    counter01 += 1
+  #
   print("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
     print(snort_rules[index])
@@ -195,7 +321,7 @@ print(packet_list)
 ### MAIN FUNCTION ###
 def main():
   #file_name = sys.argv[1]
-  file_name = "Remote_NMAP.pcap"
+  file_name = "Project test.pcapng"
   #file_name = "Project test.pcapng"
   # Check if pcap file exists
   # if os.path.isfile(file_name):
@@ -206,16 +332,6 @@ def main():
     sys.exit(1)
   #open_file = open(file_name)
   HelperMethods(scapy_cap)
-
-  #debug dictionary printing
-  ppl_keys = list(pinged_port_list)
-  ppl_vals = list(pinged_port_list.values())
-  ppl_len = len(pinged_port_list)
-  debug_counter = 0
-  while debug_counter < ppl_len:
-    print("\n" + "_____________" + "\n")
-    print(str(ppl_keys[debug_counter]) + " : " + str(ppl_vals[debug_counter]))
-    debug_counter +=1
 
   #open_file.close()
     

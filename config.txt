@@ -17,7 +17,15 @@ include_PKT_numbers = False
 EPOCH = False
 
 #Minimum packets per second to determine a scanning behavior was probably not human
+#Value must be in tenths of a second
 scan_timing_threshold = 0.1
 
-#Private port ranges (ignore a destination port when checking for NMAP scans. We don't recommend setting below 1024 or above 49151)
+#Private port ranges (ignore a destination port when checking for port scans. We don't recommend setting below 1024 or above 49151)
 private_port_ranges = ["1025-65535"]
+
+#Minimum number of unique ports for an address to interact with to suspect a port scan
+nmap_unique_ports = 15
+
+#Minimum percentage of unique ports to be used within the scan timing threshold to suspect a possible port scan.
+#Value must be a decimal
+nmap_percentage_of_violations = 0.75
