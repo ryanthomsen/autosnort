@@ -14,10 +14,36 @@ from time import gmtime, localtime
 #MAGIC NUMBERS
 GM_T = True
 PROTO_TABLE = table = {num: name[8:] for name, num in vars(socket).items() if name.startswith("IPPROTO")}
+pinged_port_list = {}
+private_port_ranges = ["1025-65535"]
 
+def port_range_check(port_num) -> int:
+  counter = 0
+  while counter < len(private_port_ranges):
+    min_val = 0
+    max_val = 0
+    delim = 0
+    entry_str = private_port_ranges[counter]
+    #checks if the entry is a range, or single int
+    if "-" in entry_str:
+      delim = entry_str.index("-")
+      min_val = int(entry_str[:delim])
+      max_val = int(entry_str[delim+1:])
+      #checks if the port is in the range
+      if port_num in range(min_val, max_val):
+        return False
+      else:
+        counter += 1
+    else:
+      if port_num == int(entry_str):
+        return False
+      else: counter += 1
+  return True
 
 class Pigget:
     def __init__(self, singlepacket, packetnum):
+      global pinged_port_list
+      self.PPL = pinged_port_list
       self.packetnum = packetnum
       if IP in singlepacket:
         self.proto = singlepacket[IP].proto
@@ -32,9 +58,26 @@ class Pigget:
                 if singlepacket.haslayer(HTTPRequest):
                     #rawload = singlepacket[0][0][Raw].load
                     self.http_method = singlepacket[HTTPRequest].Method
+            #Adds TCP packet to nmap dictionary
+            if port_range_check(self.tcpdestport):
+                source_dest_pair = self.ipsource + ":" + self.ipdest
+                str_port_add = (str(self.tcpdestport) + "-" + str(self.timestamp))
+                if source_dest_pair in pinged_port_list:
+                    pinged_port_list[source_dest_pair].append(str_port_add)
+                else: pinged_port_list[source_dest_pair] = [str_port_add]
+
         if UDP in singlepacket:
             self.udpsrcport = singlepacket[UDP].sport
             self.udpdestport = singlepacket[UDP].dport
+            #Adds UDP packet to nmap dictionary
+            if port_range_check(self.udpdestport):
+                source_dest_pair = self.ipsource + ":" + self.ipdest
+                str_port_add = (str(self.udpdestport) + "-" + str(self.timestamp))
+                if source_dest_pair in pinged_port_list:
+                    pinged_port_list[source_dest_pair].append(str_port_add)
+                else: pinged_port_list[source_dest_pair] = [str_port_add]
+
+
         if ICMP in singlepacket:
             self.icmptype = singlepacket[ICMP].type
           # Print DNS Hostname
