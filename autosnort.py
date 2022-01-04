@@ -203,7 +203,7 @@ def RuleMaker(singlepigget) -> list:
     if suggestion != '':
       rule_list.append(suggestion)
       suggestion = ''
-
+  
     
   #Return the rules
   return rule_list
@@ -243,8 +243,8 @@ def main():
   read_conf()
   global subnet
   subnet = subnet_24(Network_IP)
-  file_name = sys.argv[1]
-  #file_name = "1337 nc.pcap"
+  #file_name = sys.argv[1]
+  file_name = "1337 nc.pcap"
   #file_name = "Project test.pcapng"
   # Check if pcap file exists
   # if os.path.isfile(file_name):

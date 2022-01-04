@@ -18,7 +18,7 @@ Enable_WhiteList = False
 [Output]
 include_all_packets = False
 include_PKT_numbers = False
-PRINTPCKT = False
+PRINTPCKT = True
 
 
 [HostedServers]
