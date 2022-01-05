@@ -156,6 +156,7 @@ def tcp_rules(singlepigget) -> str:
   tcpsourceport = singlepigget.tcpsourceport
   tcpdestport = singlepigget.tcpdestport
   window_size = singlepigget.tcp_window_size
+  flags = singlepigget.flags
   #Checks if suspicious ports are used
   if tcpsourceport in BAD_PORTS:
     suggestion = "drop TCP " + str(singlepigget.ipsource) + ' ' + str(tcpsourceport) + ' -> any any (msg: "Suspicious activity from Port ' + str(tcpsourceport) + '"; sid'
@@ -165,7 +166,8 @@ def tcp_rules(singlepigget) -> str:
   if window_size > 65535:
     suggestion = "drop TCP " + str(singlepigget.ipsource) + " any -> " + str(singlepigget.ipdest) + " " + str(tcpdestport) + " (window:" + str(window_size) + '; msg: "Invalid window size; sid'
   #Checks for an x-mas tree attack
-  
+  if str(flags) == "FPU":
+    suggestion = 'drop TCP any any -> any any (flags:UPF; msg: "Attempted X-Mas tree attack"; sid'
   return suggestion
 
 
