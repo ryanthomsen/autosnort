@@ -13,6 +13,7 @@ IgnoreSubDomain = False
 Base_Ip = 192.168.55.100
 #Use Whitelist if you have more than one IP subnet
 Enable_WhiteList = False
+whitelisted_ip_addresses = []
 
 
 [Output]
@@ -20,6 +21,11 @@ include_all_packets = False
 include_PKT_numbers = False
 PRINTPCKT = True
 
+[Nmap]
+scan_timing_threshold = 0.1
+private_port_ranges = ["1025-65535"]
+nmap_unique_ports = 15
+nmap_percentage_of_violations = 0.75
 
 [HostedServers]
 dhcp_servers = 255.255.255.255, 0.0.0.0

@@ -25,6 +25,9 @@ packet_list = []
 
 ### HELPER FUNCTIONS ###
 
+
+#Method to take an ip in a string format i.e. "192.56.168.0"
+#and convert it to a list format i.e. [192,56,168,0]
 def ip2list(ipstring):
   stringbits = ipstring.split(".")
   ip = []
@@ -35,6 +38,8 @@ def ip2list(ipstring):
     ip.append(num)
   return ip
 
+#Method to take an ip in a list format i.e. [192,56,168,0]
+#and convert it to a string format i.e. "192.56.168.0"
 def iplist2string(iplist):
   ip = ""
   for num in iplist:
@@ -63,6 +68,15 @@ def read_conf():
   global PRINTPCKT
   global dhcp_servers
 
+  #NMAP Variables
+  global scan_timing_threshold
+  global private_port_ranges
+  global whitelisted_ip_addresses
+  global nmap_unique_ports
+  global nmap_percentage_of_violations
+
+
+
   parser = configparser.ConfigParser()
   parser.read("config.txt")
   SID_START = int(parser.get("Snort", "SID_START"))
@@ -84,6 +98,11 @@ def read_conf():
   for dhcp_server in snapshot_dhcp:
     dhcp_servers.append(ip2list(dhcp_server))
 
+  #Loading nmap settings:
+  scan_timing_threshold = float(parser.get("Nmap", "scan_timing_threshold"))
+  #private_port_ranges = ["1025-65535"]
+  nmap_unique_ports = int(parser.get("Nmap", "nmap_unique_ports"))
+  nmap_percentage_of_violations = float(parser.get("Nmap", "nmap_percentage_of_violations"))
 
 
 #Takes a ip address and generates a list of 256 ip's from it.
@@ -113,6 +132,14 @@ def substr_in_list(substr, inlist):
         new_list.append(fullstr)
     counter01 += 1
   return new_list
+
+
+#Listen Mode
+def listener(numpigs):
+    spacket_list = sniff(count=numpigs)
+    for iterator in range(0, numpigs):
+      loadP(spacket_list[iterator], iterator)
+
 
 
 # def port_range_check(port_num) -> int:
