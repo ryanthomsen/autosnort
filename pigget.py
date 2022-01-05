@@ -53,6 +53,8 @@ class Pigget:
         if TCP in singlepacket:
             self.tcpsourceport = singlepacket[TCP].sport
             self.tcpdestport = singlepacket[TCP].dport
+            self.tcp_window_size = singlepacket[TCP].window
+
             if self.tcpdestport == 80:
                 # Checks if packet has payload
                 if singlepacket.haslayer(HTTPRequest):
@@ -111,6 +113,8 @@ class Pigget:
         if hasattr(self, 'tcpsourceport') + hasattr(self, 'tcpdestport'):
             result += ("TCP Source Port: " + str(self.tcpsourceport) +
                        " | TCP Dest Port: " + str(self.tcpdestport) + "\n")
+            #Prints the window size
+            result += ("Window size: " + str(self.tcp_window_size) + "\n")
             # Print HTTP Request Type
             # Check if HTTP is present in the packet
             if hasattr(self, 'http_method'):

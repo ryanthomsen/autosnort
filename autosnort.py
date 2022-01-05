@@ -155,11 +155,17 @@ def tcp_rules(singlepigget) -> str:
   suggestion = ''
   tcpsourceport = singlepigget.tcpsourceport
   tcpdestport = singlepigget.tcpdestport
+  window_size = singlepigget.tcp_window_size
   #Checks if suspicious ports are used
   if tcpsourceport in BAD_PORTS:
-    suggestion = "drop TCP " + str(singlepigget.ipsource) + ' ' + str(tcpsourceport) + ' -> any any (msg: "Suspicious activity from Port ' + str(tcpsourceport) + '"; sid '
+    suggestion = "drop TCP " + str(singlepigget.ipsource) + ' ' + str(tcpsourceport) + ' -> any any (msg: "Suspicious activity from Port ' + str(tcpsourceport) + '"; sid'
     if tcpdestport == BAD_PORTS:
-      suggestion = "drop TCP any any -> " + str(singlepigget.ipdest) + ' ' + str(tcpdestport) + ' (msg: "Suspicious Port activity to Port ' + str(tcpdestport) + '"; sid '
+      suggestion = "drop TCP any any -> " + str(singlepigget.ipdest) + ' ' + str(tcpdestport) + ' (msg: "Suspicious Port activity to Port ' + str(tcpdestport) + '"; sid'
+  #Checks if the window size is too high
+  if window_size > 65535:
+    suggestion = "drop TCP " + str(singlepigget.ipsource) + " any -> " + str(singlepigget.ipdest) + " " + str(tcpdestport) + " (window:" + str(window_size) + '; msg: "Invalid window size; sid'
+  #Checks for an x-mas tree attack
+  
   return suggestion
 
 
@@ -176,15 +182,15 @@ def udp_rules(singlepigget) -> str:
 
     #Rule to catch rogue DNS requests from outside the network subnet
     if ip_dest in subnet and udpdestport == 67 and ip_source not in subnet:
-      suggestion = "drop UDP " + iplist2string(ip_source) + ' any -> ' + iplist2string(ip_dest) + ' 67 (msg: "Rogue DHCP request from ' + iplist2string(ip_source) + '"; sid '
+      suggestion = "drop UDP " + iplist2string(ip_source) + ' any -> ' + iplist2string(ip_dest) + ' 67 (msg: "Rogue DHCP request from ' + iplist2string(ip_source) + '"; sid'
     
     #Rule to catch DNS requests to servers outside the subnet.
     if ip_dest not in subnet and udpsourceport == 67 and udpdestport == 68:
-      suggestion = "drop UDP " + iplist2string(ip_source) + ' 67 -> ' + iplist2string(ip_dest) + ' 68 (msg: "DHCP Request made to ' + iplist2string(ip_dest) + ' which is outside the subnet mask."; sid '
+      suggestion = "drop UDP " + iplist2string(ip_source) + ' 67 -> ' + iplist2string(ip_dest) + ' 68 (msg: "DHCP Request made to ' + iplist2string(ip_dest) + ' which is outside the subnet mask."; sid'
     
     #Rule to catch swapped DHCP ports
     if udpsourceport == 68 and udpdestport == 67 and ip_dest in dhcp_servers:
-      suggestion = "drop UDP " + iplist2string(ip_source) + '68 -> ' + iplist2string(ip_dest) + ' 67 (msg: "Cannot connect to DHCP server on port 67."; sid '
+      suggestion = "drop UDP " + iplist2string(ip_source) + '68 -> ' + iplist2string(ip_dest) + ' 67 (msg: "Cannot connect to DHCP server on port 67."; sid'
 
   return suggestion
 
@@ -281,7 +287,7 @@ def nmap_scan_check(PPL_list):
     while counter07 < len(potential_nmap_scan_list):
       source_addr_ret = potential_nmap_scan_list[counter07][:(potential_nmap_scan_list[counter07].index(":"))]
       dest_addr_ret = potential_nmap_scan_list[counter07][(potential_nmap_scan_list[counter07].index(":"))+1:]
-      port_scan_rule_ret.append("drop any " + source_addr_ret + " any -> " + dest_addr_ret + ' any (msg: "Known port-scanning address ' + source_addr_ret + '"; sid ')
+      port_scan_rule_ret.append("drop any " + source_addr_ret + " any -> " + dest_addr_ret + ' any (msg: "Known port-scanning address ' + source_addr_ret + '"; sid')
       counter07 += 1
   return port_scan_rule_ret
 
@@ -315,7 +321,7 @@ def HelperMethods(pcap):
   print("\n\n")
   print("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
-    print(snort_rules[index] + str(SID_START) + ")\n")
+    print(snort_rules[index] + ":" + str(SID_START) + ";)\n")
     SID_START += 1
     print("# of Packets Flagged: " + str(occurences[index]))
     print("______________________________________________")
