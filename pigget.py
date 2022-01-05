@@ -17,6 +17,18 @@ PROTO_TABLE = table = {num: name[8:] for name, num in vars(socket).items() if na
 pinged_port_list = {}
 private_port_ranges = ["1025-65535"]
 
+#Takes in a gm timestamp string and returns a list
+def time_parse(gm_timestamp):
+    ret_list = []
+    while "=" in gm_timestamp:
+        delim01 = gm_timestamp.index("=") + 1
+        if "," in gm_timestamp:
+            delim02 = gm_timestamp.index(",")
+        else: delim02 = gm_timestamp.index(")")
+        ret_list.append(gm_timestamp[delim01:delim02])
+        gm_timestamp = gm_timestamp[delim02+1:]
+    return ret_list
+
 def port_range_check(port_num) -> int:
   counter = 0
   while counter < len(private_port_ranges):
@@ -103,7 +115,8 @@ class Pigget:
         if hasattr(self, 'timestamp'):
             if GM_T:
                 self.timestamp = str(gmtime(float(self.timestamp)))
-                result += ("Time: " + str(self.timestamp[3]).zfill(2) + ":" + str(self.timestamp[4]).zfill(2) + ":" + str(self.timestamp[5]).zfill(2) + " GMT, " + str(self.timestamp[1]) + "/" + str(self.timestamp[2]) + " /" + str(self.timestamp[0]) + "\n")
+                self.timestamp = time_parse(self.timestamp)
+                result += ("Time: " + str(self.timestamp[3]).zfill(2) + ":" + str(self.timestamp[4]).zfill(2) + ":" + str(self.timestamp[5]).zfill(2) + " GMT, " + str(self.timestamp[1]) + "/" + str(self.timestamp[2]) + "/" + str(self.timestamp[0]) + "\n")
             elif not GM_T:
                 result += ("Epoch Time: " + str(self.timestamp) + "\n")
 
