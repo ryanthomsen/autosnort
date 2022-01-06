@@ -20,10 +20,10 @@ def display_rules(snort_rules, occurences, SID_START, packet_list, PRINTPCKT):
     update_display("\n")
   update_display("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
-    string1 = snort_rules[index] + ":" + str(SID_START) + ";)\n"
+    string1 = snort_rules[index] + ":" + str(SID_START) + ";)"
     update_display(string1)
     SID_START += 1
-    string1= "# of Packets Flagged: " + str(occurences[index]) + "______________________________________________"
+    string1= "# of Packets Flagged:\n" + str(occurences[index]) + "______________________________________________\n"
     update_display(string1)
 
 #Method to write to display terminal
@@ -59,13 +59,14 @@ def snort_button_method():
         elif(not_listening):
             if(curr_pcap ==""):
                 update_display("Please choose and open a file at the bottom.")
-            tupleout = run_pcap(curr_pcap)
-            snort_rules = tupleout[0]
-            occurences = tupleout[1]
-            SID_START = tupleout[2]
-            packet_list = tupleout[3]
-            PRINTPCKT = tupleout[4]
-            display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
+            else:
+                tupleout = run_pcap(curr_pcap)
+                snort_rules = tupleout[0]
+                occurences = tupleout[1]
+                SID_START = tupleout[2]
+                packet_list = tupleout[3]
+                PRINTPCKT = tupleout[4]
+                display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
         TOGGLE = True
         snortbutton.configure(background="red", relief=SUNKEN, text="Close")
 

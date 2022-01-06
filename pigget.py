@@ -115,9 +115,9 @@ class Pigget:
         #Print Timestamp if avaiable
     def __str__(self):
         result = ''
-        result+=("Packet Number: " + str(self.packetnum))
+        result+=("Packet Number: " + str(self.packetnum) + "\n")
         if hasattr(self, 'proto'):
-            result+=("Protocol: " + PROTO_TABLE[self.proto])
+            result+=("Protocol: " + PROTO_TABLE[self.proto] + "\n")
         # Print IP source and destination
         # Check if the IP layer is present in the packet
         if hasattr(self, 'ipsource') and hasattr(self, 'ipdest'):
