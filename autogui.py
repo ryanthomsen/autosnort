@@ -10,11 +10,26 @@ import os
 #Bools
 TOGGLE = False
 SNIFFING = False
-pcap1 = ""
+global curr_pcap
+curr_pcap = ""
 
+def display_rules(snort_rules, occurences, SID_START, packet_list, PRINTPCKT):
+  if(PRINTPCKT):
+    for packet in packet_list:
+        packet = str(packet)
+        update_display(packet)
+    update_display("\n")
+  update_display("Snort Rule Suggestions: ")
+  for index in range(0, len(snort_rules), 1):
+    string1 = snort_rules[index] + ":" + str(SID_START) + ";)"
+    update_display(string1)
+    SID_START += 1
+    string1= "# of Packets Flagged:" + str(occurences[index]) + "\n______________________________________________\n"
+    update_display(string1)
 
 #Method to write to display terminal
 def snort_button_method():
+    global curr_pcap
     global TOGGLE
     ###IF Button is currently raised (i.e. toggle is true)
     if(TOGGLE):
@@ -22,25 +37,44 @@ def snort_button_method():
         #If in listening mode
         if(not not_listening):
             snortbutton.configure(background="turquoise2", relief=RAISED, text = "Listen")
-            pcap1 = listen4pigs(slider.get())
-            run_pcap(pcap1)
         #If not in Listening Mode
         else:
             snortbutton.configure(background="green", relief=RAISED, text = "Autosnort")
+        update_display("Traffic has been closed.")
 
-            if not_listening:
-                #Replace with way to stop sniffing
-                x = 5
-
-    ###IF Button is currently lwoered.. i.e. toggle is false
+    ###IF Button is currently lowered.. i.e. toggle is false
     else:
-        #snortbutton.configure(image = green_img)
+        if(not not_listening):
+            curr_pcap = listen4pigs(slider.get())
+            tupleout = run_pcap(curr_pcap)
+            snort_rules = tupleout[0]
+            occurences = tupleout[1]
+            SID_START = tupleout[2]
+            packet_list = tupleout[3]
+            PRINTPCKT = tupleout[4]
+            print(snort_rules)
+            display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
+        elif(not_listening):
+            if(len(curr_pcap) < 1):
+                update_display("Please choose and open a file at the bottom.")
+            else:
+                tupleout = run_pcap(curr_pcap)
+                snort_rules = tupleout[0]
+                occurences = tupleout[1]
+                SID_START = tupleout[2]
+                packet_list = tupleout[3]
+                PRINTPCKT = tupleout[4]
+                display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
+                tupleout = ''
+                snort_rules = ''
+                occurences = ''
+                SID_START = ''
+                packet_list = ''
+                PRINTPCKT = ''
+
         TOGGLE = True
         snortbutton.configure(background="red", relief=SUNKEN, text="Close")
-        if not_listening:
-            #Replace with way to start sniffing
-            x = 5
-    update_display("Tkinter is easy to use!")
+
 
 
 #Method to Open the config.txt file
@@ -50,7 +84,8 @@ def open_conf():
 
 
 def update_display(text):
-    display_win.insert(END, text + "\n")
+    display_win.insert(END, text)
+    display_win.insert(END, "\n")
 
 
 def light_controller():
@@ -78,9 +113,15 @@ def open_file():
         file_name = filename_input.get()
         if(file_name[-4:len(file_name)] == "pcap" or file_name[-6:len(file_name)] == "pcapng"):
             update_display("The pcap " + file_name + " has been opened.")
+        if os.path.isfile(file_name):
+          global curr_pcap
+          curr_pcap = rdpcap(file_name)
+        else:
+          str = "Error:" + file_name + "doesn't not exist."
+          update_display(str)
 
-        if(file_name[-3:len(file_name)] == "txt"):
-            update_display("The pigget file " + file_name + " has been opened.")    
+        #if(file_name[-3:len(file_name)] == "txt"):
+        #    update_display("The pigget file " + file_name + " has been opened.")    
         
 
 def switch_listen():
@@ -217,8 +258,8 @@ def load_GUI():
     global slider
     slider = tk.Scale(          rt_frame,
                                 label="# of Packets to Listen for:",
-                                from_=60,
-                                to=1000,
+                                from_=100,
+                                to=10000,
                                 orient=HORIZONTAL
                                 )
 

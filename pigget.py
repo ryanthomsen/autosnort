@@ -115,17 +115,18 @@ class Pigget:
         #Print Timestamp if avaiable
     def __str__(self):
         result = ''
-        print("Packet Number: " + str(self.packetnum))
+        result+=("Packet Number: " + str(self.packetnum) + "\n")
         if hasattr(self, 'proto'):
-            print("Protocol: " + PROTO_TABLE[self.proto])
+            result+=("Protocol: " + PROTO_TABLE[self.proto] + "\n")
         # Print IP source and destination
         # Check if the IP layer is present in the packet
         if hasattr(self, 'ipsource') and hasattr(self, 'ipdest'):
             result += ("IP Source: " + str(self.ipsource) + " | IP Dest: " + str(self.ipdest) + "\n")
         if hasattr(self, 'timestamp'):
             if GM_T:
-                self.timestamp = str(gmtime(float(self.timestamp)))
-                self.timestamp = time_parse(self.timestamp)
+                if(isinstance(self.timestamp, float) or isinstance(self.timestamp, EDecimal)):
+                    self.timestamp = str(gmtime(float(self.timestamp)))
+                    self.timestamp = time_parse(self.timestamp)
                 result += ("Time: " + str(self.timestamp[3]).zfill(2) + ":" + str(self.timestamp[4]).zfill(2) + ":" + str(self.timestamp[5]).zfill(2) + " GMT, " + str(self.timestamp[1]) + "/" + str(self.timestamp[2]) + "/" + str(self.timestamp[0]) + "\n")
             elif not GM_T:
                 result += ("Epoch Time: " + str(self.timestamp) + "\n")

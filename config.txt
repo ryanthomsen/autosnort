@@ -1,5 +1,5 @@
 ### Use this file to change any settings and customize how autosnort reads pcap files and outputs data
-
+### Reopen the GUI after changing settings if trying to change during session.
 
 [Snort]
 SID_START = 1000000
@@ -19,7 +19,7 @@ whitelisted_ip_addresses = []
 [Output]
 include_all_packets = False
 include_PKT_numbers = False
-PRINTPCKT = False
+PRINTPCKT = True
 Save_Output=False
 
 [Nmap]
