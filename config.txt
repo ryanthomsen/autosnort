@@ -1,12 +1,31 @@
 ### Use this file to change any settings and customize how autosnort reads pcap files and outputs data
 
+<<<<<<< Updated upstream
 #Ignore Subdomain
+=======
+[Snort]
+SID_START = 1000000
+BAD_PORTS = 1337, 666, 31, 1170, 1234, 1243, 1981, 2001, 2023, 2140, 2989, 3024, 3150, 3700, 4950, 6346, 6400, 6667, 6670, 12345,
+             12346, 16660, 18753, 20034, 20432, 20433, 27374, 27444, 27665, 30100, 31335, 31337, 33270, 33567, 33568, 40421, 60008, 65000
+
+
+[Subdomain]
+IgnoreSubDomain = False
+#Use if you only have one IP subnet, will be entered as a /24 subnet mask
+Base_Ip = 192.168.55.100
+#Use Whitelist if you have more than one IP subnet
+>>>>>>> Stashed changes
 Enable_WhiteList = False
 
 PRINTPACKET = True
 #Futher Config Settings
 include_all_packets = False
 include_PKT_numbers = False
+<<<<<<< Updated upstream
+=======
+Save_Output = False
+PRINTPCKT = False
+>>>>>>> Stashed changes
 
 #Display in Epoch Time instead of GM Time
 EPOCH = False
