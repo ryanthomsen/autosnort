@@ -4,6 +4,7 @@
 import sys
 import os
 import socket
+import configparser
 from time import gmtime
 from scapy.all import *
 from scapy.layers.inet import IP, UDP, TCP, ICMP
@@ -12,10 +13,12 @@ from scapy.layers.http import *
 from time import gmtime, localtime
 
 #MAGIC NUMBERS
+parser = configparser.ConfigParser()
+parser.read("config.txt")
 GM_T = True
 PROTO_TABLE = table = {num: name[8:] for name, num in vars(socket).items() if name.startswith("IPPROTO")}
 pinged_port_list = {}
-private_port_ranges = ["1025-65535"]
+private_port_ranges = parser.get("Nmap", "private_port_ranges")
 
 #Takes in a gm timestamp string and returns a list
 def time_parse(gm_timestamp):

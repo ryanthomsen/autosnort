@@ -74,7 +74,7 @@ def read_conf():
   global nmap_unique_ports
   global nmap_percentage_of_violations
   global SAVE_OUTPUT
-
+# private_port_ranges = ["1025-65535"]
 
   parser = configparser.ConfigParser()
   parser.read("config.txt")
@@ -99,7 +99,6 @@ def read_conf():
   SAVE_OUTPUT = parser.getboolean("Output", "Save_Output")
   #Loading nmap settings:
   scan_timing_threshold = float(parser.get("Nmap", "scan_timing_threshold"))
-  #private_port_ranges = ["1025-65535"]
   nmap_unique_ports = int(parser.get("Nmap", "nmap_unique_ports"))
   nmap_percentage_of_violations = float(parser.get("Nmap", "nmap_percentage_of_violations"))
 
@@ -138,32 +137,6 @@ def listen4pigs(numpigs):
     spacket_list = sniff(count=numpigs)
     for iterator in range(0, numpigs):
       loadP(spacket_list[iterator], iterator)
-
-
-
-# def port_range_check(port_num) -> int:
-#   counter = 0
-#   while counter < len(private_port_ranges):
-#     min_val = 0
-#     max_val = 0
-#     delim = 0
-#     entry_str = private_port_ranges[counter]
-#     #checks if the entry is a range, or single int
-#     if "-" in entry_str:
-#       delim = entry_str.index("-")
-#       min_val = int(entry_str[:delim])
-#       max_val = int(entry_str[delim+1:])
-#       #checks if the port is in the range
-#       if port_num in range(min_val, max_val):
-#         return False
-#       else:
-#         counter += 1
-#     else:
-#       if port_num == int(entry_str):
-#         return False
-#       else:
-#         counter += 1
-#   return True
 
 
 def loadP(singlepacket, counter):

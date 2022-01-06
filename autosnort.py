@@ -17,8 +17,6 @@ from time import gmtime, localtime
 
 ### MAIN FUNCTION ###
 def main():
-    print(sys.argv[1])
-    input()
     read_conf()
     #Open File Option
     if sys.argv[1] == "-o":
