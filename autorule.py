@@ -324,11 +324,15 @@ def run_pcap(pcap):
     snort_rules.append(nmap_rules[counter01])
     occurences.append(1)
     counter01 += 1
+  return(snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
+
+
+def print_rules(snort_rules, occurences):
   global PRINTPCKT
-  print(str(PRINTPCKT))
   if(PRINTPCKT):
     printlist(packet_list)
-  print("\n\n")
+    print("\n\n")
+  global SID_START
   print("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
     print(snort_rules[index] + ":" + str(SID_START) + ";)\n")

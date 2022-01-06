@@ -44,13 +44,19 @@ def main():
         else:
           print("Error:", file_name, "doesn't not exist.")
           sys.exit(1)
-        run_pcap(scapy_cap)
+        tupleout = run_pcap(scapy_cap)
+        snort_rules = tupleout[0]
+        occurences = tupleout[1]
+        print_rules(snort_rules, occurences)
     
     #Listen Mode Option
       elif sys.argv[1] == "-l":
         num_pack = int(sys.argv[2])
         pcap1 = listen4pigs(num_pack)
-        run_pcap(pcap1)
+        tupleout = run_pcap(pcap1)
+        snort_rules = tupleout[0]
+        occurences = tupleout[1]
+        print_rules(snort_rules, occurences)
 
     elif len(sys.argv) == 4:
       if sys.argv[1] == "-p":
