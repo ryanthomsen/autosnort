@@ -62,7 +62,7 @@ def main():
 
     if len(sys.argv) == 2:
       if sys.argv[1] == "-help":
-        file_name = sys.argv[2]
+        file_name = sys.argv[1]
         print("Welcome to Auto Snort!\n"
               "This is a tool for automatically suggesting snort rules.\n"
               "Options available are\n"
