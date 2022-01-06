@@ -39,11 +39,8 @@ def snort_button_method():
         #If not in Listening Mode
         else:
             snortbutton.configure(background="green", relief=RAISED, text = "Autosnort")
-
-
-            if not_listening:
-                #Replace with way to stop sniffing
-                x = 5
+        update_display("File has been close.")
+        curr_pcap = ""
 
     ###IF Button is currently lowered.. i.e. toggle is false
     else:
@@ -57,7 +54,7 @@ def snort_button_method():
             PRINTPCKT = tupleout[4]
             display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
         elif(not_listening):
-            if(curr_pcap ==""):
+            if(len(curr_pcap) < 1):
                 update_display("Please choose and open a file at the bottom.")
             else:
                 tupleout = run_pcap(curr_pcap)
