@@ -19,24 +19,25 @@ from time import gmtime, localtime
 def main():
     read_conf()
     #Open File Option
-    if sys.argv[1] == "-o":
-      file_name = sys.argv[2]
-      if os.path.isfile(file_name):
-        scapy_cap = rdpcap(file_name)
-      else:
-        print("Error:", file_name, "doesn't not exist.")
-        sys.exit(1)
-      run_pcap(scapy_cap)
+    if len(sys.argv) == 3:
+      if sys.argv[1] == "-o":
+        file_name = sys.argv[2]
+        if os.path.isfile(file_name):
+          scapy_cap = rdpcap(file_name)
+        else:
+          print("Error:", file_name, "doesn't not exist.")
+          sys.exit(1)
+        run_pcap(scapy_cap)
     
     #Listen Mode Option
-    elif sys.argv[1] == "-l":
-      file_name = sys.argv[2]
-      num_pack = sys.argv[3]
-      pcap1 = listen4pigs(num_pack)
-      run_pcap(pcap1)
+    if len(sys.argv) == 3:
+      if sys.argv[1] == "-l":
+        num_pack = sys.argv[1]
+        pcap1 = listen4pigs(num_pack)
+        run_pcap(pcap1)
 
-    if sys.argv[1] == "-p":
-      if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
+      if sys.argv[1] == "-p":
         file_name = sys.argv[2]
         if(".txt" == file_name[-4:len(file_name)]):
             f=open(file_name)
@@ -54,22 +55,25 @@ def main():
         pcap1 = listen4pigs(num_pack)
         run_pcap(pcap1)
 
-    if sys.argv[1] == "-g":
-        load_GUI()
 
-    if sys.argv[1] == "-help":
-      file_name = sys.argv[2]
-      print("Welcome to Auto Snort!\n"
-            "This is a tool for automatically suggesting snort rules.\n"
-            "Options available are\n"
-            "Open pcap/pigget.txt file for analysis     ./autosnort -o filename\n"
-            "Listen for x # of packets then analyze         ./autosnort -l #ofpackets\n"
-            "View specific packet(s) info in a pigget.txt file    ./autosnort -p piggetfilename packet(s)num2view\n"
-            "Open autosnort GUI     ./autosnort -g\n"
-            "Open autosnort help page     ./autosnort -help\n"
-            "Script made by Ryan Thomsen and Matt Ages\n"
-            "Pigget.txt file is just a text file saved by Autosnort."
-            )
+    if len(sys.argv) == 2:
+      if sys.argv[1] == "-g":
+          load_GUI()
+
+    if len(sys.argv) == 2:
+      if sys.argv[1] == "-help":
+        file_name = sys.argv[2]
+        print("Welcome to Auto Snort!\n"
+              "This is a tool for automatically suggesting snort rules.\n"
+              "Options available are\n"
+              "Open pcap/pigget.txt file for analysis     ./autosnort -o filename\n"
+              "Listen for x # of packets then analyze         ./autosnort -l #ofpackets\n"
+              "View specific packet(s) info in a pigget.txt file    ./autosnort -p piggetfilename packet(s)num2view\n"
+              "Open autosnort GUI     ./autosnort -g\n"
+              "Open autosnort help page     ./autosnort -help\n"
+              "Script made by Ryan Thomsen and Matt Ages\n"
+              "Pigget.txt file is just a text file saved by Autosnort."
+              )
     else:
       print("Uknown Arguments given. Try ./autosnort -help")
 
