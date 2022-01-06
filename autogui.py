@@ -23,7 +23,7 @@ def display_rules(snort_rules, occurences, SID_START, packet_list, PRINTPCKT):
     string1 = snort_rules[index] + ":" + str(SID_START) + ";)"
     update_display(string1)
     SID_START += 1
-    string1= "# of Packets Flagged:\n" + str(occurences[index]) + "______________________________________________\n"
+    string1= "# of Packets Flagged:" + str(occurences[index]) + "\n______________________________________________\n"
     update_display(string1)
 
 #Method to write to display terminal
@@ -39,7 +39,7 @@ def snort_button_method():
         #If not in Listening Mode
         else:
             snortbutton.configure(background="green", relief=RAISED, text = "Autosnort")
-        update_display("File has been close.")
+        update_display("Traffic has been closed.")
         curr_pcap = ""
 
     ###IF Button is currently lowered.. i.e. toggle is false
