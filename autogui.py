@@ -340,5 +340,5 @@ def load_GUI():
     choose_file_button.grid_columnconfigure(0, weight=0)
     open_file_button.grid(row=2, column=3, sticky="WE")
     open_file_button.grid_columnconfigure(0, weight=0)
-
     root.mainloop()
+load_GUI()
