@@ -16,7 +16,8 @@ curr_pcap = ""
 def display_rules(snort_rules, occurences, SID_START, packet_list, PRINTPCKT):
   if(PRINTPCKT):
     for packet in packet_list:
-        update_display(str(packet))
+        packet = str(packet)
+        update_display(packet)
     update_display("\n")
   update_display("Snort Rule Suggestions: ")
   for index in range(0, len(snort_rules), 1):
@@ -40,7 +41,6 @@ def snort_button_method():
         else:
             snortbutton.configure(background="green", relief=RAISED, text = "Autosnort")
         update_display("Traffic has been closed.")
-        curr_pcap = ""
 
     ###IF Button is currently lowered.. i.e. toggle is false
     else:
@@ -52,6 +52,7 @@ def snort_button_method():
             SID_START = tupleout[2]
             packet_list = tupleout[3]
             PRINTPCKT = tupleout[4]
+            print(snort_rules)
             display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
         elif(not_listening):
             if(len(curr_pcap) < 1):
@@ -64,6 +65,13 @@ def snort_button_method():
                 packet_list = tupleout[3]
                 PRINTPCKT = tupleout[4]
                 display_rules( snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
+                tupleout = ''
+                snort_rules = ''
+                occurences = ''
+                SID_START = ''
+                packet_list = ''
+                PRINTPCKT = ''
+
         TOGGLE = True
         snortbutton.configure(background="red", relief=SUNKEN, text="Close")
 

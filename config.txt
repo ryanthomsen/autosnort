@@ -19,7 +19,7 @@ whitelisted_ip_addresses = []
 [Output]
 include_all_packets = False
 include_PKT_numbers = False
-PRINTPCKT = False
+PRINTPCKT = True
 Save_Output=False
 
 [Nmap]

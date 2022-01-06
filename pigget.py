@@ -124,8 +124,9 @@ class Pigget:
             result += ("IP Source: " + str(self.ipsource) + " | IP Dest: " + str(self.ipdest) + "\n")
         if hasattr(self, 'timestamp'):
             if GM_T:
-                self.timestamp = str(gmtime(float(self.timestamp)))
-                self.timestamp = time_parse(self.timestamp)
+                if(isinstance(self.timestamp, float) or isinstance(self.timestamp, EDecimal)):
+                    self.timestamp = str(gmtime(float(self.timestamp)))
+                    self.timestamp = time_parse(self.timestamp)
                 result += ("Time: " + str(self.timestamp[3]).zfill(2) + ":" + str(self.timestamp[4]).zfill(2) + ":" + str(self.timestamp[5]).zfill(2) + " GMT, " + str(self.timestamp[1]) + "/" + str(self.timestamp[2]) + "/" + str(self.timestamp[0]) + "\n")
             elif not GM_T:
                 result += ("Epoch Time: " + str(self.timestamp) + "\n")
