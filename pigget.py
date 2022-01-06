@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 ### IMPORT STATEMENTS ###
+from re import split
 import sys
 import os
 import socket
@@ -13,12 +14,17 @@ from scapy.layers.http import *
 from time import gmtime, localtime
 
 #MAGIC NUMBERS
-parser = configparser.ConfigParser()
-parser.read("config.txt")
 GM_T = True
 PROTO_TABLE = table = {num: name[8:] for name, num in vars(socket).items() if name.startswith("IPPROTO")}
 pinged_port_list = {}
-private_port_ranges = parser.get("Nmap", "private_port_ranges")
+
+
+def private_ranger():
+    parser = configparser.ConfigParser()
+    parser.read("config.txt")
+    private_port_ranges = parser.get("Nmap", "private_port_ranges")
+    return private_port_ranges
+
 
 #Takes in a gm timestamp string and returns a list
 def time_parse(gm_timestamp):
@@ -33,6 +39,7 @@ def time_parse(gm_timestamp):
     return ret_list
 
 def port_range_check(port_num) -> int:
+  private_port_ranges = [private_ranger()]
   counter = 0
   while counter < len(private_port_ranges):
     min_val = 0
@@ -99,7 +106,7 @@ class Pigget:
             self.icmptype = singlepacket[ICMP].type
           # Print DNS Hostname
 	    # Check if DNS is present in the packet
-        if DNS in singlepacket:
+        if DNSQR in singlepacket:
             self.hostname = singlepacket[DNSQR].qname
         if DNSRR in singlepacket:
             self.hostaddr = singlepacket[DNSRR].rdata

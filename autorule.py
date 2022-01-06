@@ -55,6 +55,11 @@ scan_timing_threshold = 0.1
 nmap_unique_ports = 15
 nmap_percentage_of_violations = 0.75
 
+def numsan(stringnum):
+  stringnum = str(stringnum)
+  stringnum = re.sub("[^0-9]", "", stringnum)
+  stringnum = int(stringnum)
+  return stringnum
 
 #Reads config.txt
 def read_conf():
@@ -134,9 +139,9 @@ def substr_in_list(substr, inlist):
 
 #Listen Mode
 def listen4pigs(numpigs):
+    numpigs = numsan(numpigs)
     spacket_list = sniff(count=numpigs)
-    for iterator in range(0, numpigs):
-      loadP(spacket_list[iterator], iterator)
+    return spacket_list
 
 
 def loadP(singlepacket, counter):
