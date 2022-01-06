@@ -54,22 +54,22 @@ def main():
 
     elif len(sys.argv) == 4:
       if sys.argv[1] == "-p":
-        file_name = sys.argv[2]
-        if(".txt" == file_name[-4:len(file_name)]):
-            f=open(file_name)
-            f.readlines()
-            f.close()
-        else:
-            print("Must be a pigget file followed by a packet number / range of packet numbers.")
-        num_pack = sys.argv[3]
-        if ("-" in num_pack):
-          plist = num_pack.split("-")
-          while(plist[0] < plist[1]):
-            print(plist[0])
-            plist[0] = plist[0] + 1
-
-        pcap1 = listen4pigs(num_pack)
-        run_pcap(pcap1)
+        print("Coming Soon. Need Sleep first.")
+      #    file_name = sys.argv[2]
+      #    if(".txt" == file_name[-4:len(file_name)]):
+      #        f=open(file_name)
+      #        f.readlines()
+      #        f.close()
+      #   else:
+      #   print("Must be a pigget file followed by a packet number / range of packet numbers.")
+      #   num_pack = sys.argv[3]
+      #if ("-" in num_pack):
+      #   plist = num_pack.split("-")
+      #   while(plist[0] < plist[1]):
+      #     print(plist[0])
+      #     plist[0] = plist[0] + 1
+      #   pcap1 = listen4pigs(num_pack)
+      #   run_pcap(pcap1)
 
     else:
       print("Uknown Arguments given. Try ./autosnort -help")

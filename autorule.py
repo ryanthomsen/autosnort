@@ -324,6 +324,8 @@ def run_pcap(pcap):
     snort_rules.append(nmap_rules[counter01])
     occurences.append(1)
     counter01 += 1
+  global PRINTPCKT
+  print(str(PRINTPCKT))
   if(PRINTPCKT):
     printlist(packet_list)
   print("\n\n")
