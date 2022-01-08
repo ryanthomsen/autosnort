@@ -29,7 +29,7 @@ def main():
               "Options available are\n"
               "Open pcap/pigget.txt file for analysis     ./autosnort -f filename\nor ./autosnort --file filename\n"
               "Listen for x # of packets then analyze         ./autosnort -l #ofpackets\nor ./autosnort --listen\n"
-              "View specific packet(s) info in a pigget.txt file (Coming soon)    ./autosnort -p piggetfilename packet(s)num2view\n"
+              #"View specific packet(s) info in a pigget.txt file (Coming soon)    ./autosnort -p piggetfilename packet(s)num2view\n"
               "Open autosnort GUI     ./autosnort -g\nor ./autosnort --options\n"
               "Open autosnort settings ./autosnort -o\nor ./autosnort --options\n"
               "Open autosnort help page    ./autosnort -\nor ./autosnort --help\n"
