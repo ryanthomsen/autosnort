@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 ### IMPORT STATEMENTS ###
+from re import sub
 import sys
 import os
 import socket
@@ -121,6 +122,16 @@ def subnet_24(ip)-> list:
   subnet.append([0,0,0,0])
   return subnet
 
+def substr_in_list_bool(substr, inlist):
+  #takes in a list and a substring, and returns true if thing is yes
+  #only if substring is at the beginning of the string
+  counter01 = 0
+  while counter01 < len(inlist):
+    if isinstance(inlist[counter01], str):
+      if substr in inlist[counter01] and inlist[counter01].index(substr) == 0:
+        return True
+    counter01 += 1
+  return False
 
 def substr_in_list(substr, inlist):
   #takes in a list and a substring, and returns a l8st of occurances
@@ -135,6 +146,7 @@ def substr_in_list(substr, inlist):
         new_list.append(fullstr)
     counter01 += 1
   return new_list
+
 
 
 #Listen Mode
@@ -235,17 +247,32 @@ def nmap_scan_check(PPL_list):
     #If a port shows up more than twice, we remove all but the first and last occurances
     #Goes through the list of ports
     new_val_list = val_list[counter01]
+    port_redund_list = []
+    tmstmp_redund_list = []
+    #Loads the redundant port list
     while counter02 < len(val_list[counter01]):
       current_port_string = val_list[counter01][counter02]
       prt_str_delim = current_port_string.index("-")
       this_port = current_port_string[:prt_str_delim+1]
       #takes the prefix of each port and compares them to their occurrances in the list
-      port_occ_list = substr_in_list(this_port, new_val_list)
-      #if the occurrance is not identical to the first or last one, it gets sliced out
-      if len(port_occ_list) > 2 and current_port_string != port_occ_list[0] and current_port_string != port_occ_list[-1]:
-          new_val_list = new_val_list[:counter02] + new_val_list[counter02+1:]
+      #If the current port has not shown up in the redundancy list:
+      if not this_port in port_redund_list:
+        port_occ_list = substr_in_list(this_port, new_val_list)
+        if len(port_occ_list) > 1:
+          port_occ_list = port_occ_list[:1] + port_occ_list[-1:]
+          tmstmp_redund_list.append(port_occ_list[0])
+          tmstmp_redund_list.append(port_occ_list[1])
+        else:
+          tmstmp_redund_list.append(port_occ_list[0])
+        port_redund_list.append(this_port)
+      counter02 += 1
+    #removes everything not on the redundant port list
+    counter08 = 0
+    while counter08 < len(new_val_list):
+      if not new_val_list[counter08] in tmstmp_redund_list:
+        new_val_list = new_val_list[:counter08] + new_val_list[counter08+1:]
       else:
-        counter02 += 1
+        counter08 += 1
     val_list[counter01] = new_val_list
     counter01 += 1
   #return val_list
