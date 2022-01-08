@@ -17,27 +17,32 @@ from time import gmtime, localtime
 
 ### MAIN FUNCTION ###
 def main():
+    recognized = False
     read_conf()
     if len(sys.argv) == 2:
-      if sys.argv[1] == "-g":
-          load_GUI()
-      elif sys.argv[1] == "-help":
-        file_name = sys.argv[1]
+      if sys.argv[1] in "--gui" and "-" in sys.argv[1]:
+        recognized = True
+        load_GUI()
+      elif sys.argv[1] in "--help" and "-" in sys.argv[1]:
         print("Welcome to Auto Snort!\n"
               "This is a tool for automatically suggesting snort rules.\n"
               "Options available are\n"
-              "Open pcap/pigget.txt file for analysis     ./autosnort -o filename\n"
-              "Listen for x # of packets then analyze         ./autosnort -l #ofpackets\n"
-              "View specific packet(s) info in a pigget.txt file    ./autosnort -p piggetfilename packet(s)num2view\n"
-              "Open autosnort GUI     ./autosnort -g\n"
-              "Open autosnort help page     ./autosnort -help\n"
+              "Open pcap/pigget.txt file for analysis     ./autosnort -f filename\nor ./autosnort --file filename\n"
+              "Listen for x # of packets then analyze         ./autosnort -l #ofpackets\nor ./autosnort --listen\n"
+              "View specific packet(s) info in a pigget.txt file (Coming soon)    ./autosnort -p piggetfilename packet(s)num2view\n"
+              "Open autosnort GUI     ./autosnort -g\nor ./autosnort --options\n"
+              "Open autosnort settings ./autosnort -o\nor ./autosnort --options\n"
+              "Open autosnort help page    ./autosnort -\nor ./autosnort --help\n"
               "Script made by Ryan Thomsen and Matt Ages\n"
               "Pigget.txt file is just a text file saved by Autosnort."
               )
-
+      elif sys.argv[1] in "--options" and "-" in sys.argv[1]:
+        open_conf()
+        recognized = True
     #Open File Option
     elif len(sys.argv) == 3:
-      if sys.argv[1] == "-o":
+      if sys.argv[1] in "--file" and "-" in sys.argv[1]:
+        recognized = True
         file_name = sys.argv[2]
         if os.path.isfile(file_name):
           scapy_cap = rdpcap(file_name)
@@ -50,7 +55,8 @@ def main():
         print_rules(snort_rules, occurences)
     
     #Listen Mode Option
-      elif sys.argv[1] == "-l":
+      elif sys.argv[1] in "--listen" and "-" in sys.argv[1]:
+        recognized = True
         num_pack = int(sys.argv[2])
         pcap1 = listen4pigs(num_pack)
         tupleout = run_pcap(pcap1)
@@ -60,6 +66,7 @@ def main():
 
     elif len(sys.argv) == 4:
       if sys.argv[1] == "-p":
+        recognized = True
         print("Coming Soon. Need Sleep first.")
       #    file_name = sys.argv[2]
       #    if(".txt" == file_name[-4:len(file_name)]):
@@ -76,8 +83,7 @@ def main():
       #     plist[0] = plist[0] + 1
       #   pcap1 = listen4pigs(num_pack)
       #   run_pcap(pcap1)
-
-    else:
+    if(not recognized):
       print("Uknown Arguments given. Try ./autosnort -help")
 
     #   #file_name = sys.argv[1]
