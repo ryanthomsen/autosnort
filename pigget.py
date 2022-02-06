@@ -18,7 +18,7 @@ GM_T = True
 PROTO_TABLE = table = {num: name[8:] for name, num in vars(socket).items() if name.startswith("IPPROTO")}
 pinged_port_list = {}
 
-
+#Function to read private port ranges from config file for use in pigget
 def private_ranger():
     parser = configparser.ConfigParser()
     parser.read("config.txt")
@@ -26,7 +26,7 @@ def private_ranger():
     return private_port_ranges
 
 
-#Takes in a gm timestamp string and returns a list
+#Takes in a gm timestamp string and returns a list of sperated values
 def time_parse(gm_timestamp):
     ret_list = []
     while "=" in gm_timestamp:
@@ -38,6 +38,7 @@ def time_parse(gm_timestamp):
         gm_timestamp = gm_timestamp[delim02+1:]
     return ret_list
 
+#Check against private port ranges (Used in nmap checker)
 def port_range_check(port_num) -> int:
   private_port_ranges = [private_ranger()]
   counter = 0
@@ -62,16 +63,19 @@ def port_range_check(port_num) -> int:
       else: counter += 1
   return True
 
+#Pigget object for easier handling of packets than scapy module
 class Pigget:
     def __init__(self, singlepacket, packetnum):
       global pinged_port_list
       self.PPL = pinged_port_list
       self.packetnum = packetnum
+      #Assigns IP variables to pigget if they exist within the packet
       if IP in singlepacket:
         self.proto = singlepacket[IP].proto
         self.ipsource = singlepacket[IP].src
         self.ipdest = singlepacket[IP].dst
         self.timestamp = singlepacket.time
+        #Assigns TCP variables to pigget if they exist within the packet
         if TCP in singlepacket:
             self.tcpsourceport = singlepacket[TCP].sport
             self.tcpdestport = singlepacket[TCP].dport
@@ -89,7 +93,7 @@ class Pigget:
                 if source_dest_pair in pinged_port_list:
                     pinged_port_list[source_dest_pair].append(str_port_add)
                 else: pinged_port_list[source_dest_pair] = [str_port_add]
-
+        #Assigns UDP variables to pigget if they exist within the packet
         if UDP in singlepacket:
             self.udpsrcport = singlepacket[UDP].sport
             self.udpdestport = singlepacket[UDP].dport
@@ -100,8 +104,7 @@ class Pigget:
                 if source_dest_pair in pinged_port_list:
                     pinged_port_list[source_dest_pair].append(str_port_add)
                 else: pinged_port_list[source_dest_pair] = [str_port_add]
-
-
+        #Assigns ICMP variables to pigget if they exist within the packet
         if ICMP in singlepacket:
             self.icmptype = singlepacket[ICMP].type
           # Print DNS Hostname
@@ -112,7 +115,7 @@ class Pigget:
             self.hostaddr = singlepacket[DNSRR].rdata
             #self.recordtype = singlepacket[DNSRR].qtype
 
-        #Print Timestamp if avaiable
+    #Definition of how to print our Pigget object
     def __str__(self):
         result = ''
         result+=("Packet Number: " + str(self.packetnum) + "\n")
@@ -122,6 +125,7 @@ class Pigget:
         # Check if the IP layer is present in the packet
         if hasattr(self, 'ipsource') and hasattr(self, 'ipdest'):
             result += ("IP Source: " + str(self.ipsource) + " | IP Dest: " + str(self.ipdest) + "\n")
+        #Print Timestamp if avaiable
         if hasattr(self, 'timestamp'):
             if GM_T:
                 if(isinstance(self.timestamp, float) or isinstance(self.timestamp, EDecimal)):

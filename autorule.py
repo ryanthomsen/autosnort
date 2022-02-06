@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+#REQUIRES SCAPY
+
 ### IMPORT STATEMENTS ###
 from re import sub
 import sys
@@ -56,14 +58,17 @@ scan_timing_threshold = 0.1
 nmap_unique_ports = 15
 nmap_percentage_of_violations = 0.75
 
+#Function to convert a string of nums to a integer, dealing with possible whitespace
 def numsan(stringnum):
   stringnum = str(stringnum)
   stringnum = re.sub("[^0-9]", "", stringnum)
   stringnum = int(stringnum)
   return stringnum
 
-#Reads config.txt
+#Reads config.txt and assigns variables
 def read_conf():
+  #Initializing all variables as global variables
+  #See config.txt for a list of what all variables do
   global SID_START
   global BAD_PORTS
   global Network_IP
@@ -81,12 +86,13 @@ def read_conf():
   global nmap_percentage_of_violations
   global SAVE_OUTPUT
 # private_port_ranges = ["1025-65535"]
-
+  #Config reader
   parser = configparser.ConfigParser()
   parser.read("config.txt")
   SID_START = int(parser.get("Snort", "SID_START"))
   BAD_PORTS = parser.get("Snort", "BAD_PORTS")
   BAD_PORTS = BAD_PORTS.split(",")
+  #Appends each Bad port to a list from the string in config
   for num in range(0, len(BAD_PORTS)):
     BAD_PORTS[num] = int(re.sub("[^0-9]", "", BAD_PORTS[num]))
   Network_IP = parser.get("Subdomain", "Base_IP")
@@ -100,6 +106,7 @@ def read_conf():
   dhcp_servers = dhcp_servers.split(",")
   snapshot_dhcp = dhcp_servers
   dhcp_servers = []
+  #Sets each DHCP server from a list in config
   for dhcp_server in snapshot_dhcp:
     dhcp_servers.append(ip2list(dhcp_server))
   SAVE_OUTPUT = parser.getboolean("Output", "Save_Output")
@@ -122,9 +129,10 @@ def subnet_24(ip)-> list:
   subnet.append([0,0,0,0])
   return subnet
 
+#Function to check if a substring is in a list, returns bool saying if in list
 def substr_in_list_bool(substr, inlist):
-  #takes in a list and a substring, and returns true if thing is yes
-  #only if substring is at the beginning of the string
+  #takes in a list and a substring, and returns true if substring in list
+  #if substring is at the beginning of the string
   counter01 = 0
   while counter01 < len(inlist):
     if isinstance(inlist[counter01], str):
@@ -133,8 +141,9 @@ def substr_in_list_bool(substr, inlist):
     counter01 += 1
   return False
 
+#Function to check if a substring is in a list, returns new list of occurances
 def substr_in_list(substr, inlist):
-  #takes in a list and a substring, and returns a l8st of occurances
+  #takes in a list and a substring, and returns a list of occurances
   #only if substring is at the beginning of the string
   new_list = []
   counter01 = 0
@@ -149,23 +158,23 @@ def substr_in_list(substr, inlist):
 
 
 
-#Listen Mode
+#Function for Listen Mode, returns a packet list after sniffing for set time (numpigs)
 def listen4pigs(numpigs):
     numpigs = numsan(numpigs)
     spacket_list = sniff(count=numpigs)
     return spacket_list
 
-
+#Function to converts packet to Pigget friendly packet from a scapy packet
 def loadP(singlepacket, counter):
   custom_packet = Pigget(singlepacket, counter)
   return custom_packet
-
+#Function to print all items in a list
 def printlist(list):
   for item in list:
     print(item)
 
 
-
+#Function to handle rules related to TCP
 def tcp_rules(singlepigget) -> str:
   #Setting up basic variables
   suggestion = ''
@@ -186,7 +195,7 @@ def tcp_rules(singlepigget) -> str:
     suggestion = 'drop TCP any any -> any any (flags:UPF; msg: "Attempted X-Mas tree attack"; sid'
   return suggestion
 
-
+#Function to handle rules related to UDP
 def udp_rules(singlepigget) -> str:
   ##Setting up basic variables
   suggestion = ''
@@ -218,14 +227,14 @@ def udp_rules(singlepigget) -> str:
 def RuleMaker(singlepigget) -> list:
   suggestion = ""
   rule_list = []
-  #TCP Rules
+  #TCP Rules, checks for TCP information
   if hasattr(singlepigget, 'tcpsourceport') + hasattr(singlepigget, 'tcpdestport'):
     suggestion = tcp_rules(singlepigget)
     if suggestion != '':
       rule_list.append(suggestion)
       suggestion = ''
   
-  #UDP Rules
+  #UDP Rules, checks for UDP information
   if hasattr(singlepigget, 'udpsourceport') + hasattr(singlepigget, 'udpdestport'):
     suggestion = udp_rules(singlepigget)
     if suggestion != '':
@@ -235,7 +244,7 @@ def RuleMaker(singlepigget) -> list:
   #Return the rules
   return rule_list
 
-
+#Function to check for nmap scan on network or in pcap, Matt Ages
 def nmap_scan_check(PPL_list):
   counter01 = 0
   key_list = list(PPL_list)
@@ -325,6 +334,7 @@ def nmap_scan_check(PPL_list):
   return port_scan_rule_ret
 
 
+#Function to run pcap file and prepare pigget objects for later use
 def run_pcap(pcap):
   global subnet
   subnet = subnet_24(Network_IP)
@@ -353,7 +363,7 @@ def run_pcap(pcap):
     counter01 += 1
   return(snort_rules, occurences, SID_START, packet_list, PRINTPCKT)
 
-
+#Function to print snort rules
 def print_rules(snort_rules, occurences):
   global PRINTPCKT
   if(PRINTPCKT):

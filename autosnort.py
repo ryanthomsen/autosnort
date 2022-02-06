@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-
+#Main file running the logic behind autosnort
+#Calls appropriate methods from other files
+#Depending on options used
+#Currently only works in a bash style terminal
 ### IMPORT STATEMENTS ###
 import sys
 import os
@@ -16,13 +19,16 @@ from scapy.layers.http import *
 from time import gmtime, localtime
 
 ### MAIN FUNCTION ###
+#Looks for specific options o determine what mode to run autosnort in
 def main():
     recognized = False
-    read_conf()
+    read_conf() #Read config file to prepare for running autosnort
     if len(sys.argv) == 2:
+      #Gui Option checker
       if sys.argv[1] in "--gui" and "-" in sys.argv[1]:
         recognized = True
         load_GUI()
+      #Help Option checker
       elif sys.argv[1] in "--help" and "-" in sys.argv[1]:
         print("Welcome to Auto Snort!\n"
               "This is a tool for automatically suggesting snort rules.\n"
@@ -36,6 +42,7 @@ def main():
               "Script made by Ryan Thomsen and Matt Ages\n"
               "Pigget.txt file is just a text file saved by Autosnort."
               )
+      #Options/Config settings checker
       elif sys.argv[1] in "--options" and "-" in sys.argv[1]:
         open_conf()
         recognized = True
@@ -63,7 +70,7 @@ def main():
         snort_rules = tupleout[0]
         occurences = tupleout[1]
         print_rules(snort_rules, occurences)
-
+    #Planned packet reader functionality, currently unimplemented
     elif len(sys.argv) == 4:
       if sys.argv[1] == "-p":
         recognized = True
@@ -83,6 +90,7 @@ def main():
       #     plist[0] = plist[0] + 1
       #   pcap1 = listen4pigs(num_pack)
       #   run_pcap(pcap1)
+    #If none of the above options were recognized, suggests opening help menu
     if(not recognized):
       print("Uknown Arguments given. Try ./autosnort -help")
 
