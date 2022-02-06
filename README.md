@@ -1,6 +1,7 @@
 # autosnort
 Suggest Snort Rules based on Network Traffic
 Authors: Ryan Thomsen, Matt Ages
+Requires python and scapy to be installed in order to function.
 
 Learn how to protect your network using Autosnort! 
 
